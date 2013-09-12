@@ -1,0 +1,526 @@
+# Microsoft Developer Studio Generated Dependency File, included by ProtRenderer.mak
+
+.\_lalgebra.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\aminoAcid.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\atomBag.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\AtomList.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\atomRadiusLookup.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\caList.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\funclib.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\GeometryParser.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\main.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\mathlib.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\ObjRenderer.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\outputFile.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\PdbAtom.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\pdbParser.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\PocketAlignment.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\prime.c : \
+	".\defs.h"\
+	".\prime.h"\
+	".\set.h"\
+	
+
+.\Renderer.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\set.c : \
+	".\defs.h"\
+	".\prime.h"\
+	".\set.h"\
+	
+
+.\StdAfx.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\SurfaceObject.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
+
+.\SurfaceOutput.cpp : \
+	".\_lalgebra.h"\
+	".\aminoAcid.h"\
+	".\atomBag.h"\
+	".\AtomList.h"\
+	".\atomRadiusLookup.h"\
+	".\caList.h"\
+	".\conf.h"\
+	".\defs.h"\
+	".\funclib.h"\
+	".\GeometryParser.h"\
+	".\glui.h"\
+	".\mathlib.h"\
+	".\ObjRenderer.h"\
+	".\outputFile.h"\
+	".\PdbAtom.h"\
+	".\pdbParser.h"\
+	".\PocketAlignment.h"\
+	".\prime.h"\
+	".\Renderer.h"\
+	".\set.h"\
+	".\StdAfx.h"\
+	".\SurfaceObject.h"\
+	".\SurfaceOutput.h"\
+	"c:\program files\microsoft visual studio\vc98\include\gl\glut.h"\
+	
