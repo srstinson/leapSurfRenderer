@@ -382,7 +382,7 @@ public:
         static const float kfMaxScale = 2.0f;
 
         //If automatic motion type detection is enabled, check if motion probabilities are above threshold amounts
-        bool bShouldTranslate = true;
+        bool bShouldTranslate = false;
         bool bShouldRotate    = true;
         bool bShouldScale     = true;
 
@@ -390,7 +390,7 @@ public:
 
         if ( m_uiFlags & kFlag_Automatic )
         {
-          bShouldTranslate = frame.translationProbability(m_lastFrame) > 0.40;
+          //bShouldTranslate = frame.translationProbability(m_lastFrame) > 0.40;
           bShouldRotate    = frame.rotationProbability(m_lastFrame)    > 0.40;
           bShouldScale     = frame.scaleProbability(m_lastFrame)       > 0.40;
 
@@ -418,7 +418,7 @@ public:
                                                   kfMinScale,
                                                   kfMaxScale );
         }
-
+		/*
         //Shift grid translation if too far to a side
         if (m_vTotalMotionTranslation.x <= -kfGridScale) 
         {
@@ -446,6 +446,7 @@ public:
         {
           m_vTotalMotionTranslation.z -= kfGridScale;
         }
+		*/
     }
 
     /// affects model view matrix.  needs to be inside a glPush/glPop matrix block!
@@ -500,20 +501,20 @@ public:
           }
           break;
         }
-
+		
         //Set the 3D grid transformation matrix
         glMultMatrixf(m_mtxTotalMotionRotation.toArray4x4());
         glScalef(m_fTotalMotionScale, m_fTotalMotionScale, m_fTotalMotionScale);
-        glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
-
+        //glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
+		
 		
         //Draw the infinite grid
         static const float kfSide = kfNumGrids*kfGridScale*0.5f;
         static const float kfAtten = kfGridScale*kfGridScale;
-
+		
         glLineWidth(1.0f);
         glBegin(GL_LINES);
-
+		
         for ( float i = -kfSide; i < kfSide; i += kfGridScale) 
         {
           for ( float j = -kfSide; j < kfSide; j += kfGridScale) 
@@ -552,6 +553,8 @@ public:
         }
 
         glEnd();
+		
+		surf->draw(false,false,false,true,NULL,NULL);
     }
 
     // data should be drawn here but no heavy calculations done.
@@ -610,13 +613,6 @@ public:
 
           LeapUtilGL::drawAxes();
         }
-
-		{
-			//draw the protein
-			double * colors = new double[3];
-			colors[0]=0;colors[1]=0;colors[2]=1;
-			surf->draw(true,true,false,false,NULL,colors);
-		}
 
         {
           ScopedLock renderLock(m_renderMutex);
