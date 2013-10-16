@@ -164,7 +164,7 @@ public:
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
         glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
@@ -507,7 +507,7 @@ public:
         glScalef(m_fTotalMotionScale, m_fTotalMotionScale, m_fTotalMotionScale);
         //glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
 		
-		
+		/*
         //Draw the infinite grid
         static const float kfSide = kfNumGrids*kfGridScale*0.5f;
         static const float kfAtten = kfGridScale*kfGridScale;
@@ -552,9 +552,9 @@ public:
           }
         }
 
-        glEnd();
-		
+		*/
 		surf->draw(false,false,false,true,NULL,NULL);
+		glEnd();
     }
 
     // data should be drawn here but no heavy calculations done.

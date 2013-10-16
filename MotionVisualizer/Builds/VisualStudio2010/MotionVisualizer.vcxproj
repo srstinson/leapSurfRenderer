@@ -968,6 +968,7 @@
     <ClCompile Include="..\..\SurfRenderer\SurfaceObject.cpp" />
     <ClCompile Include="..\..\SurfRenderer\SurfaceOutput.cpp" />
     <ClCompile Include="..\..\SurfRenderer\_lalgebra.cpp" />
+    <ClCompile Include="SurfaceSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\LeapSDK\util\LeapUtil.h" />
@@ -1335,6 +1336,7 @@
     <ClInclude Include="..\..\SurfRenderer\SurfaceObject.h" />
     <ClInclude Include="..\..\SurfRenderer\SurfaceOutput.h" />
     <ClInclude Include="..\..\SurfRenderer\_lalgebra.h" />
+    <ClInclude Include="SurfaceSet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.txt" />

@@ -1,4 +1,4 @@
-﻿Build started 9/25/2013 3:30:54 PM.
+﻿Build started 10/9/2013 4:40:15 PM.
      1>Project "C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\MotionVisualizer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I..\..SurfRenderer /I..\..\JuceLibraryCode /I..\..\..\..\LeapSDK\include /I..\..\..\..\LeapSDK\util /ZI /nologo /W4 /WX- /MP /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D INTERACTIVEMODE /D OPENGL_RENDERING /D WIN32 /D _WINDOWS /D DEBUG /D _DEBUG /D LEAP_SCENE_USE_UTIL_GL=1 /D JUCER_VS2010_78A501D=1 /D _MBCS /Gm- /EHsc /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"Debug\\" /Fd"Debug\\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\Source\Main.cpp
@@ -66,4 +66,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.72
+Time Elapsed 00:00:02.85

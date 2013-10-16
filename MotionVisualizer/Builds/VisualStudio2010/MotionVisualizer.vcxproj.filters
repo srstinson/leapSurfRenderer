@@ -849,6 +849,7 @@
     <ClCompile Include="..\..\SurfRenderer\StdAfx.cpp" />
     <ClCompile Include="..\..\SurfRenderer\SurfaceObject.cpp" />
     <ClCompile Include="..\..\SurfRenderer\SurfaceOutput.cpp" />
+    <ClCompile Include="SurfaceSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\LeapSDK\util\LeapUtil.h" />
@@ -1890,6 +1891,7 @@
     <ClInclude Include="..\..\SurfRenderer\StdAfx.h" />
     <ClInclude Include="..\..\SurfRenderer\SurfaceObject.h" />
     <ClInclude Include="..\..\SurfRenderer\SurfaceOutput.h" />
+    <ClInclude Include="SurfaceSet.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\resources.rc" />
