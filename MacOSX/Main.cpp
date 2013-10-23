@@ -215,6 +215,7 @@ public:
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         
         m_fixedFont = Font("Courier New", 24, Font::plain );
+        m_uiFlags ^= kFlag_Transparent;
         m_uiFlags ^= kFlag_Rotate;
         m_uiFlags ^= kFlag_Scale;
     }
