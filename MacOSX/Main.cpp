@@ -12,9 +12,16 @@
 #include "StdAfx.h"
 #include <string>
 #include <math.h>
+#include <dirent.h>
+#include <iostream>
 
 class MotionVisualizerWindow;
 class OpenGLCanvas;
+
+CriticalSection mutex;
+
+std::vector<std::string> GetAllFilesWithExtension(const std::string & ext);
+void setSurfaces(Boolean loadSurfaces);
 
 static const float kfNumGrids   = 15.0f;
 static const float kfGridScale  = 120.0f;
@@ -23,6 +30,7 @@ int main_window;		///referenced by GLUI to get back to the main window
 
 //GLUI windows
 //GLUI * Renderer::glui_controls;
+
 float aspectRatio;
 float * obj_pos;
 float * obj_rot;
@@ -33,7 +41,8 @@ int * useCentroid;
 //GLUI_EditText * Renderer::glui_input_file_field;
 //GLUI_EditText * Renderer::glui_output_file_field;
 
-SurfaceObject * surf;
+SurfaceObject * surf = NULL;
+SurfaceObject * surfCompared = NULL;
 
 ///my stuff
 char * outputFileName;
@@ -54,11 +63,19 @@ set_t surf_pos;		//float ** surf_pos;
 set_t surf_rot;		//float ** surf_rot;
 double * centroid;	///double * centroid
 
-bool keyFlag;
+int keyFlag;
 
 int background;
 
+std::vector<std::string> surfSets;
+std::vector<std::vector<std::string>> surfsInSet;
+
 std::string currentFile;
+std::string comparedFile;
+
+int surfSetIndex = 0;
+int surfIndex1 = -1;
+int surfIndex2 = -1;
 
 float angleX = 0;
 float angleY = 0;
@@ -226,7 +243,7 @@ public:
     
     bool keyPressed( const KeyPress& keyPress )
     {
-        if (keyFlag == false){
+        if (keyFlag == 0){
             int iKeyCode = toupper(keyPress.getKeyCode());
             
             if ( iKeyCode == KeyPress::escapeKey )
@@ -248,6 +265,110 @@ public:
                 float fStep = (m_fLeftRightEyeShift > 5.0f) ? 1.0f : ((m_fLeftRightEyeShift > 1.0f)  ? 0.25f : 0.05f);
                 m_fLeftRightEyeShift = LeapUtil::Max( m_fLeftRightEyeShift - fStep, 0.0f );
                 updateStateStr();
+                return true;
+            }
+            
+            if ( iKeyCode == KeyPress::rightKey )
+            {
+                if(surfSetIndex == surfSets.size()){
+                    surfSetIndex = 0;
+                }
+                else{
+                    surfSetIndex++;
+                }
+                if(surfsInSet[surfSetIndex-1].size() >= 1){
+                    surfIndex1 = 0;
+                }
+                if(surfsInSet[surfSetIndex-1].size() >= 2){
+                    surfIndex2 = 1;
+                }
+                if(surfSetIndex == 0){
+                    currentFile = "";
+                    comparedFile = "";
+                    surfIndex1 = -1;
+                    surfIndex2 = -1;
+                }
+                setSurfaces(true);
+                return true;
+            }
+            
+            if ( iKeyCode == KeyPress::leftKey )
+            {
+                if(surfSetIndex == 0){
+                    surfSetIndex = surfSets.size();
+                }
+                else{
+                    surfSetIndex--;
+                }
+                if(surfsInSet[surfSetIndex-1].size() >= 1){
+                    surfIndex1 = 0;
+                }
+                if(surfsInSet[surfSetIndex-1].size() >= 2){
+                    surfIndex2 = 1;
+                }
+                if(surfSetIndex == 0){
+                    currentFile = "";
+                    comparedFile = "";
+                    surfIndex1 = -1;
+                    surfIndex2 = -1;
+                }
+                setSurfaces(true);
+                return true;
+            }
+            
+            if ( iKeyCode == KeyPress::upKey )
+            {
+                if(surfIndex2 != -1){
+                if(surfIndex2 == surfsInSet[surfSetIndex-1].size()-1){
+                    surfIndex2 = 0;
+                }
+                else{
+                    surfIndex2++;
+                }
+                }
+                setSurfaces(true);
+                return true;
+            }
+            
+            if ( iKeyCode == KeyPress::downKey )
+            {
+                if(surfIndex2 != -1){
+                if(surfIndex2 == 0){
+                    surfIndex2 = surfsInSet[surfSetIndex-1].size()-1;
+                }
+                else{
+                    surfIndex2--;
+                }
+                }
+                setSurfaces(true);
+                return true;
+            }
+            
+            if ( iKeyCode == '.' )
+            {
+                if(surfIndex1 != -1){
+                    if(surfIndex1 == surfsInSet[surfSetIndex-1].size()-1){
+                        surfIndex1 = 0;
+                    }
+                    else{
+                        surfIndex1++;
+                    }
+                }
+                setSurfaces(true);
+                return true;
+            }
+            
+            if ( iKeyCode == ',' )
+            {
+                if(surfIndex1 != -1){
+                    if(surfIndex1 == 0){
+                        surfIndex1 = surfsInSet[surfSetIndex-1].size()-1;
+                    }
+                    else{
+                        surfIndex1--;
+                    }
+                }
+                setSurfaces(true);
                 return true;
             }
             
@@ -284,8 +405,40 @@ public:
                     
                 case 'F':
                     currentFile = "";
-                    keyFlag = true;
+                    surfIndex1 = -1;
+                    surfIndex2 = -2;
+                    surfSetIndex = 0;
+                    keyFlag = 1;
                     break;
+                    
+                case 'C':
+                    comparedFile = "";
+                    surfIndex1 = -1;
+                    surfIndex2 = -2;
+                    surfSetIndex = 0;
+                    keyFlag = 2;
+                    break;
+                    
+                case 'M':
+                    if(surfIndex1 != -1 && surfSets.size() > 1){
+                        surfsInSet[surfSetIndex - 1].erase(surfsInSet[surfSetIndex - 1].begin() + surfIndex1);
+                        if(surfSetIndex == surfSets.size()){
+                            surfSetIndex = 1;
+                        }
+                        else{
+                            surfSetIndex++;
+                        }
+                        surfsInSet[surfSetIndex - 1].push_back(currentFile);
+                        surfIndex1 = surfsInSet[surfSetIndex - 1].size()-1;
+                        surfIndex2 = 0;
+                    }
+                    else if(surfSets.size() > 0 && currentFile != ""){
+                        surfsInSet[0].push_back(currentFile);
+                        surfSetIndex = 1;
+                        surfIndex1 = surfsInSet[0].size()-1;
+                        surfIndex2 = 0;
+                    }
+                    setSurfaces(true);
                     
                 default:
                     return false;
@@ -293,22 +446,19 @@ public:
             
             updateStateStr();
         }
-        else{
+        else if(keyFlag == 1){
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
-                char *cstr = new char[currentFile.length() + 1];
-                strcpy(cstr, currentFile.c_str());
-                surf = parseGeometryFile(cstr);
-                delete [] cstr;
-                obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
+                setSurfaces(false);
+                /*obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
                 obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
                 obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
                 obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
                 obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
                 obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
                 obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
-                obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;
-                keyFlag = false;
+                obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
+                keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
                 if (currentFile.size() > 0)  currentFile.resize(currentFile.size () - 1);
@@ -320,6 +470,30 @@ public:
                 std::cout<<cKeyCode<<std::endl;
             }
         }
+        else{
+            int iKeyCode = keyPress.getKeyCode();
+            if(iKeyCode == KeyPress::returnKey){
+                setSurfaces(false);
+                /*obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
+                 obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
+                 obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
+                 obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
+                 obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
+                 obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
+                 obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
+                 obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
+                keyFlag = 0;
+            }
+            else if(iKeyCode == KeyPress::backspaceKey){
+                if (comparedFile.size() > 0)  comparedFile.resize(comparedFile.size () - 1);
+                //std::cout<<"Yep"<<std::endl;
+            }
+            else{
+                char cKeyCode = keyPress.getTextCharacter();
+                comparedFile += cKeyCode;
+                std::cout<<cKeyCode<<std::endl;
+            }
+        }
         return true;
     }
     
@@ -328,17 +502,11 @@ public:
         m_aStrState[0] = String::empty;
         m_aStrState[1] = String::empty;
         m_aStrState[2] = String::empty;
-        m_aStrState[3] = String::empty;
-        m_aStrState[4] = String::empty;
         
         m_aStrState[0]  << "[T]ransparency: " << LeapUtil::BoolToStr( m_uiFlags & kFlag_Transparent );
         m_aStrState[1]  << "[R]otate: "    << LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
         m_aStrState[2]  << "[S]cale: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
         
-        if ( m_uiFlags & kFlag_RedBlue3D )
-        {
-            m_aStrState[4] << "Left/Right Shift: " << String(m_fLeftRightEyeShift, 2);
-        }
     }
     
     void mouseDown (const MouseEvent& e)
@@ -444,9 +612,12 @@ public:
         g.setColour( Colours::salmon );
         g.drawSingleLineText( m_strPrompt, iMargin, iBaseLine );
         m_strFile += currentFile.c_str();
+        m_strCompFile += comparedFile.c_str();
         g.drawSingleLineText( m_strFile, iMargin, iBaseLine + iLineStep );
+        g.drawSingleLineText( m_strCompFile, iMargin, iBaseLine + 2*iLineStep );
         m_strFile = "[F]ile: ";
-        
+        m_strCompFile = "[C]ompare File: ";
+                
         if ( m_uiFlags & kFlag_FPS )
         {
             g.setColour( Colours::seagreen );
@@ -469,7 +640,7 @@ public:
         
         g.setColour( Colours::orange );
         
-        for ( int i = 4, uiTotalWidth = 0; i >= 0; i-- )
+        for ( int i = 3, uiTotalWidth = 0; i >= 0; i-- )
         {
             if ( !m_aStrState[i].isEmpty() )
             {
@@ -489,6 +660,36 @@ public:
                 
                 uiTotalWidth += uiStrWidth + iFontSize;
             }
+        }
+        m_strGroup = "Group: ";
+        //std::cout<<surfSetIndex<<std::endl;
+        for(int i = 0; i < surfSets.size() + 1; i++){
+            if(i ==surfSetIndex){m_strGroup += "[";}
+            m_strGroup += i;
+            if(i ==surfSetIndex){m_strGroup += "]";}
+            m_strGroup += " ";
+        }
+        g.setColour( Colours::orange );
+        g.drawSingleLineText( m_strGroup,
+                             rectBounds.getCentreX(),
+                             rectBounds.getBottom() - 2*(iFontSize*2),
+                             Justification::horizontallyCentred );
+        m_strIndividual = "Surfs: ";
+        //std::cout<<surfSets.size()<<std::endl;
+        if(surfSetIndex >= 1){
+            for(int i = 0; i < surfsInSet[surfSetIndex-1].size(); i++){
+                if(i ==surfIndex1){m_strIndividual += "[";}
+                if(i ==surfIndex2){m_strIndividual += "{";}
+                m_strIndividual += i;
+                if(i ==surfIndex2){m_strIndividual += "}";}
+                if(i ==surfIndex1){m_strIndividual += "]";}
+                m_strIndividual += " ";
+            }
+            g.setColour( Colours::orange );
+            g.drawSingleLineText( m_strIndividual,
+                                 rectBounds.getCentreX(),
+                                 rectBounds.getBottom() - 3*(iFontSize*2),
+                                 Justification::horizontallyCentred );
         }
     }
     
@@ -702,7 +903,7 @@ public:
         glLineWidth(LINEWIDTH);
         
         
-        if (currentFile.compare("") != 0 && keyFlag == false){
+        if (currentFile.compare("") != 0 && keyFlag == 0){
             
             if(surf == NULL){
                 printf("File not found! Try again.\n");
@@ -726,7 +927,13 @@ public:
                 glEnd();
                 
                 glTranslatef(-surf->centroid[0], -surf->centroid[1], -surf->centroid[2]);
+                mutex.enter();
                 surf->draw(false, false, (m_uiFlags & kFlag_Transparent), true, NULL, NULL);
+                if(comparedFile != ""){
+                    //glTranslatef(-surfCompared->centroid[0], -surfCompared->centroid[1], -surfCompared->centroid[2]);
+                    surfCompared->draw(false, false, true, true, NULL, NULL);
+                }
+                mutex.exit();
                 glPopMatrix();
             }
         }
@@ -861,9 +1068,12 @@ private:
     String                      m_strUpdateFPS;
     String                      m_strRenderFPS;
     String                      m_strHelp;
-    String                      m_aStrState[5];
+    String                      m_aStrState[4];
+    String                      m_strGroup;
+    String                      m_strIndividual;
     String                      m_strPrompt;
     String                      m_strFile;
+    String                      m_strCompFile;
     uint32_t                    m_uiFlags;
     CriticalSection             m_renderMutex;
 };
@@ -923,8 +1133,92 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
     obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
     obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
     obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;
-    keyFlag = false;
+    keyFlag = 0;
+    surfSets = GetAllFilesWithExtension(".SURFSET");
+    for(int i =  0; i < surfSets.size(); i++){
+        std::vector<std::string> surfaces;
+        ifstream file;
+        file.open(surfSets[i].c_str());
+        std::string surfLoc;
+        while (file.good())
+        {
+            getline (file, surfLoc, ',');
+            surfLoc = std::string(surfLoc, 0, surfLoc.length());
+            std::cout<<surfLoc<<std::endl;
+            surfaces.push_back(surfLoc);
+        }
+        surfsInSet.push_back(surfaces);
+    }
     m_pMainWindow = new MotionVisualizerWindow();
+}
+
+std::vector<std::string> GetAllFilesWithExtension(const std::string & ext)
+{
+    std::vector<std::string> surfSets2;
+    DIR* dirp = opendir(".");
+    dirent* dp;
+    while ((dp = readdir(dirp)) != NULL){
+        std::string filePathString = dp->d_name;
+        if(filePathString.find(".SURFSET") != filePathString.npos){
+            surfSets2.push_back(filePathString);
+            //std::cout<<filePathString<<std::endl;
+        }
+    }
+    (void)closedir(dirp);
+    
+    return surfSets2;
+}
+
+void setSurfaces(Boolean loadSurfaces){
+    mutex.enter();
+    SurfaceObject * surfTemp = NULL;
+    SurfaceObject * surfTemp2 = NULL;
+
+    std::cout<<surf<<" "<<surfCompared<<std::endl;
+    
+    if(surf != NULL){
+        surfTemp = surf;
+    }
+    if(surfCompared != NULL){
+        surfTemp2 = surfCompared;
+    }
+    
+    std::cout<<surfTemp<<" "<<surfTemp2<<std::endl;
+    
+    if(surfIndex1 != -1 && surfSetIndex > 0){
+        currentFile = surfsInSet[surfSetIndex-1][surfIndex1];
+    }
+    if(surfIndex2 != -1 && surfSetIndex > 0){
+        comparedFile = surfsInSet[surfSetIndex-1][surfIndex2];
+    }
+    if(currentFile != ""){
+        char *cstr = new char[currentFile.length() + 1];
+        strcpy(cstr, currentFile.c_str());
+        surf = parseGeometryFile(cstr);
+        delete [] cstr;
+    }
+    if(comparedFile != ""){
+        char *cstr = new char[comparedFile.length() + 1];
+        strcpy(cstr, comparedFile.c_str());
+        surfCompared = parseGeometryFile(cstr);
+        delete [] cstr;
+    }
+    
+    if(surfTemp != NULL){
+        if(surf == surfTemp){
+            surf = NULL;
+        }
+        std::cout<<surf<<" "<<surfTemp<<std::endl;
+        surfTemp->dispose();
+    }
+    if(surfTemp2 != NULL){
+        if(surfCompared == surfTemp2){
+            surfCompared = NULL;
+        }
+        std::cout<<surfCompared<<" "<<surfTemp2<<std::endl;
+        surfTemp2->dispose();
+    }
+    mutex.exit();
 }
 
 //==============================================================================
