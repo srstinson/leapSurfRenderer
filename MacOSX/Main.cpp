@@ -22,6 +22,12 @@ CriticalSection mutex;
 
 std::vector<std::string> GetAllFilesWithExtension(const std::string & ext);
 void setSurfaces(Boolean loadSurfaces);
+void groupPointerRight();
+void groupPointerLeft();
+void surfacePointerRight(int surfFoc);
+void surfacePointerLeft(int surfFoc);
+void moveSurface();
+void saveSurfSets();
 
 static const float kfNumGrids   = 15.0f;
 static const float kfGridScale  = 120.0f;
@@ -208,6 +214,8 @@ public:
         
         m_fLeftRightEyeShift = 2.0f;
         
+        m_strSave = "[S]ave";
+        
         m_strFile = "[F]ile: ";
     }
     
@@ -270,105 +278,37 @@ public:
             
             if ( iKeyCode == KeyPress::rightKey )
             {
-                if(surfSetIndex == surfSets.size()){
-                    surfSetIndex = 0;
-                }
-                else{
-                    surfSetIndex++;
-                }
-                if(surfsInSet[surfSetIndex-1].size() >= 1){
-                    surfIndex1 = 0;
-                }
-                if(surfsInSet[surfSetIndex-1].size() >= 2){
-                    surfIndex2 = 1;
-                }
-                if(surfSetIndex == 0){
-                    currentFile = "";
-                    comparedFile = "";
-                    surfIndex1 = -1;
-                    surfIndex2 = -1;
-                }
-                setSurfaces(true);
+                groupPointerRight();
                 return true;
             }
             
             if ( iKeyCode == KeyPress::leftKey )
             {
-                if(surfSetIndex == 0){
-                    surfSetIndex = surfSets.size();
-                }
-                else{
-                    surfSetIndex--;
-                }
-                if(surfsInSet[surfSetIndex-1].size() >= 1){
-                    surfIndex1 = 0;
-                }
-                if(surfsInSet[surfSetIndex-1].size() >= 2){
-                    surfIndex2 = 1;
-                }
-                if(surfSetIndex == 0){
-                    currentFile = "";
-                    comparedFile = "";
-                    surfIndex1 = -1;
-                    surfIndex2 = -1;
-                }
-                setSurfaces(true);
+                groupPointerLeft();
                 return true;
             }
             
             if ( iKeyCode == KeyPress::upKey )
             {
-                if(surfIndex2 != -1){
-                if(surfIndex2 == surfsInSet[surfSetIndex-1].size()-1){
-                    surfIndex2 = 0;
-                }
-                else{
-                    surfIndex2++;
-                }
-                }
-                setSurfaces(true);
+                surfacePointerRight(0);
                 return true;
             }
             
             if ( iKeyCode == KeyPress::downKey )
             {
-                if(surfIndex2 != -1){
-                if(surfIndex2 == 0){
-                    surfIndex2 = surfsInSet[surfSetIndex-1].size()-1;
-                }
-                else{
-                    surfIndex2--;
-                }
-                }
-                setSurfaces(true);
+                surfacePointerLeft(0);
                 return true;
             }
             
             if ( iKeyCode == '.' )
             {
-                if(surfIndex1 != -1){
-                    if(surfIndex1 == surfsInSet[surfSetIndex-1].size()-1){
-                        surfIndex1 = 0;
-                    }
-                    else{
-                        surfIndex1++;
-                    }
-                }
-                setSurfaces(true);
+                surfacePointerRight(1);
                 return true;
             }
             
             if ( iKeyCode == ',' )
             {
-                if(surfIndex1 != -1){
-                    if(surfIndex1 == 0){
-                        surfIndex1 = surfsInSet[surfSetIndex-1].size()-1;
-                    }
-                    else{
-                        surfIndex1--;
-                    }
-                }
-                setSurfaces(true);
+                surfacePointerLeft(1);
                 return true;
             }
             
@@ -388,15 +328,19 @@ public:
                     break;
                     
                 case 'H':
-                    m_uiFlags ^= (kFlag_Help | kFlag_FPS);
+                    //m_uiFlags ^= (kFlag_Help | kFlag_FPS);
                     return true;
                     
                 case 'R':
                     m_uiFlags ^= kFlag_Rotate;
                     break;
                     
-                case 'S':
+                case 'Z':
                     m_uiFlags ^= kFlag_Scale;
+                    break;
+                    
+                case 'S':
+                    saveSurfSets();
                     break;
                     
                 case 'T':
@@ -420,25 +364,8 @@ public:
                     break;
                     
                 case 'M':
-                    if(surfIndex1 != -1 && surfSets.size() > 1){
-                        surfsInSet[surfSetIndex - 1].erase(surfsInSet[surfSetIndex - 1].begin() + surfIndex1);
-                        if(surfSetIndex == surfSets.size()){
-                            surfSetIndex = 1;
-                        }
-                        else{
-                            surfSetIndex++;
-                        }
-                        surfsInSet[surfSetIndex - 1].push_back(currentFile);
-                        surfIndex1 = surfsInSet[surfSetIndex - 1].size()-1;
-                        surfIndex2 = 0;
-                    }
-                    else if(surfSets.size() > 0 && currentFile != ""){
-                        surfsInSet[0].push_back(currentFile);
-                        surfSetIndex = 1;
-                        surfIndex1 = surfsInSet[0].size()-1;
-                        surfIndex2 = 0;
-                    }
-                    setSurfaces(true);
+                    moveSurface();
+                    break;
                     
                 default:
                     return false;
@@ -451,13 +378,13 @@ public:
             if(iKeyCode == KeyPress::returnKey){
                 setSurfaces(false);
                 /*obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
-                obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
-                obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
-                obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
-                obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
-                obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
-                obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
-                obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
+                 obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
+                 obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
+                 obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
+                 obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
+                 obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
+                 obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
+                 obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
@@ -505,7 +432,7 @@ public:
         
         m_aStrState[0]  << "[T]ransparency: " << LeapUtil::BoolToStr( m_uiFlags & kFlag_Transparent );
         m_aStrState[1]  << "[R]otate: "    << LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
-        m_aStrState[2]  << "[S]cale: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
+        m_aStrState[2]  << "[Z]oom: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
         
     }
     
@@ -519,10 +446,10 @@ public:
         (void)e;
         double angleDirectionX = e.getDistanceFromDragStartX();
         double angleDirectionY = e.getDistanceFromDragStartY();
-
+        
         int direction = 0;
         
-
+        
         if (fabs(angleDirectionX) > fabs(angleDirectionY)){
             //rotate about y
             direction = 1;
@@ -610,14 +537,15 @@ public:
         g.setFont( static_cast<float>(iFontSize) );
         
         g.setColour( Colours::salmon );
-        g.drawSingleLineText( m_strPrompt, iMargin, iBaseLine );
+        //g.drawSingleLineText( m_strPrompt, iMargin, iBaseLine );
         m_strFile += currentFile.c_str();
         m_strCompFile += comparedFile.c_str();
+        g.drawSingleLineText( m_strSave, iMargin, iBaseLine);
         g.drawSingleLineText( m_strFile, iMargin, iBaseLine + iLineStep );
         g.drawSingleLineText( m_strCompFile, iMargin, iBaseLine + 2*iLineStep );
         m_strFile = "[F]ile: ";
         m_strCompFile = "[C]ompare File: ";
-                
+        
         if ( m_uiFlags & kFlag_FPS )
         {
             g.setColour( Colours::seagreen );
@@ -640,7 +568,7 @@ public:
         
         g.setColour( Colours::orange );
         
-        for ( int i = 3, uiTotalWidth = 0; i >= 0; i-- )
+        for ( int i = 2, uiTotalWidth = 0; i >= 0; i-- )
         {
             if ( !m_aStrState[i].isEmpty() )
             {
@@ -745,7 +673,7 @@ public:
             double angleDirectionY = frame.translation(m_lastFrame).z;
             
             int direction = 0;
-
+            
             if ((fabs(angleDirectionX) > fabs(angleDirectionY))){
                 //rotate about y
                 direction = 1;
@@ -754,7 +682,7 @@ public:
                 //rotate about x
                 direction = 2;
             }
-                        
+            
             if (direction == 1){
                 if(angleDirectionX > 0){
                     angleY = fmod((angleY + 0.05),2*PI);
@@ -815,7 +743,7 @@ public:
         glEnable(GL_BLEND);
         glDisable(GL_LIGHTING);
         
-    
+        
     }
     
     void drawScene( eDrawMode drawMode )
@@ -825,8 +753,8 @@ public:
         Leap::Vector vColor( 0.5, 1, 1 );
         
         //Set the 3D grid transformation matrix
-//        glMultMatrixf(m_mtxTotalMotionRotation.toArray4x4());
-//        glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
+        //        glMultMatrixf(m_mtxTotalMotionRotation.toArray4x4());
+        //        glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
         glScalef(m_fTotalMotionScale, m_fTotalMotionScale, m_fTotalMotionScale);
         
         //Draw the infinite grid
@@ -938,7 +866,7 @@ public:
             }
         }
     }
-
+    
     // data should be drawn here but no heavy calculations done.
     // any major calculations that only need to be updated per leap data frame
     // should be handled in update and cached in members.
@@ -1068,10 +996,11 @@ private:
     String                      m_strUpdateFPS;
     String                      m_strRenderFPS;
     String                      m_strHelp;
-    String                      m_aStrState[4];
+    String                      m_aStrState[3];
     String                      m_strGroup;
     String                      m_strIndividual;
     String                      m_strPrompt;
+    String                      m_strSave;
     String                      m_strFile;
     String                      m_strCompFile;
     uint32_t                    m_uiFlags;
@@ -1173,7 +1102,7 @@ void setSurfaces(Boolean loadSurfaces){
     mutex.enter();
     SurfaceObject * surfTemp = NULL;
     SurfaceObject * surfTemp2 = NULL;
-
+    
     std::cout<<surf<<" "<<surfCompared<<std::endl;
     
     if(surf != NULL){
@@ -1219,6 +1148,144 @@ void setSurfaces(Boolean loadSurfaces){
         surfTemp2->dispose();
     }
     mutex.exit();
+}
+
+void groupPointerRight(){
+    if(surfSetIndex == surfSets.size()){
+        surfSetIndex = 0;
+    }
+    else{
+        surfSetIndex++;
+    }
+    if(surfsInSet[surfSetIndex-1].size() >= 1){
+        surfIndex1 = 0;
+    }
+    if(surfsInSet[surfSetIndex-1].size() >= 2){
+        surfIndex2 = 1;
+    }
+    if(surfSetIndex == 0){
+        currentFile = "";
+        comparedFile = "";
+        surfIndex1 = -1;
+        surfIndex2 = -1;
+    }
+    setSurfaces(true);
+}
+
+void groupPointerLeft(){
+    if(surfSetIndex == 0){
+        surfSetIndex = surfSets.size();
+    }
+    else{
+        surfSetIndex--;
+    }
+    if(surfsInSet[surfSetIndex-1].size() >= 1){
+        surfIndex1 = 0;
+    }
+    if(surfsInSet[surfSetIndex-1].size() >= 2){
+        surfIndex2 = 1;
+    }
+    if(surfSetIndex == 0){
+        currentFile = "";
+        comparedFile = "";
+        surfIndex1 = -1;
+        surfIndex2 = -1;
+    }
+    setSurfaces(true);
+}
+
+void surfacePointerRight(int surfFoc){
+    if (surfFoc == 0){
+        if(surfIndex2 != -1){
+            if(surfIndex2 == surfsInSet[surfSetIndex-1].size()-1){
+                surfIndex2 = 0;
+            }
+            else{
+                surfIndex2++;
+            }
+        }
+    }
+    else{
+        if(surfIndex1 != -1){
+            if(surfIndex1 == surfsInSet[surfSetIndex-1].size()-1){
+                surfIndex1 = 0;
+            }
+            else{
+                surfIndex1++;
+            }
+        }
+    }
+    setSurfaces(true);
+}
+
+void surfacePointerLeft(int surfFoc){
+    if (surfFoc == 0){
+        if(surfIndex2 != -1){
+            if(surfIndex2 == 0){
+                surfIndex2 = surfsInSet[surfSetIndex-1].size()-1;
+            }
+            else{
+                surfIndex2--;
+            }
+        }
+    }
+    else{
+        if(surfIndex1 != -1){
+            if(surfIndex1 == 0){
+                surfIndex1 = surfsInSet[surfSetIndex-1].size()-1;
+            }
+            else{
+                surfIndex1--;
+            }
+        }
+    }
+    setSurfaces(true);
+}
+
+void moveSurface(){
+    if(surfIndex1 != -1 && surfSets.size() > 1){
+        surfsInSet[surfSetIndex - 1].erase(surfsInSet[surfSetIndex - 1].begin() + surfIndex1);
+        if(surfSetIndex == surfSets.size()){
+            surfSetIndex = 1;
+        }
+        else{
+            surfSetIndex++;
+        }
+        surfsInSet[surfSetIndex - 1].push_back(currentFile);
+        surfIndex1 = surfsInSet[surfSetIndex - 1].size()-1;
+        surfIndex2 = 0;
+    }
+    else if(surfSets.size() > 0 && currentFile != ""){
+        surfsInSet[0].push_back(currentFile);
+        surfSetIndex = 1;
+        surfIndex1 = surfsInSet[0].size()-1;
+        surfIndex2 = 0;
+    }
+    setSurfaces(true);
+}
+
+void saveSurfSets(){
+    //std::vector<std::string> surfSets;
+    //std::vector<std::vector<std::string>> surfsInSet;
+    for(int i = 0; i < surfSets.size(); i++){
+        std::string setBeingSaved = surfSets[i];
+        std::string fileText = "";
+        std::ofstream saveFile;
+        //char *cstr = new char[setBeingSaved.length() + 1];
+        //strcpy(cstr, setBeingSaved.c_str());
+        //std::cout<<setBeingSaved<<std::endl;
+        saveFile.open(setBeingSaved.c_str());
+        //delete [] cstr;
+        for(int j = 0; j < surfsInSet[i].size(); j++){
+            fileText += surfsInSet[i][j];
+            if (j != surfsInSet[i].size() - 1){
+                fileText += ",";
+            }
+        }
+        //std::cout<<fileText<<std::endl;
+        saveFile << fileText;
+        saveFile.close();
+    }
 }
 
 //==============================================================================
