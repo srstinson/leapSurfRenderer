@@ -83,6 +83,11 @@ int surfSetIndex = 0;
 int surfIndex1 = -1;
 int surfIndex2 = -1;
 
+int lastSwipe = 0;
+int lastCircle = 0;
+
+int mode = 0;
+
 float angleX = 0;
 float angleY = 0;
 
@@ -149,6 +154,7 @@ private:
 //==============================================================================
 class OpenGLCanvas  : public Component,
 public OpenGLRenderer,
+
 Leap::Listener
 {
 public:
@@ -331,13 +337,26 @@ public:
                     //m_uiFlags ^= (kFlag_Help | kFlag_FPS);
                     return true;
                     
-                case 'R':
-                    m_uiFlags ^= kFlag_Rotate;
+                case 'N':
+                    if (mode == 0){
+                        mode = 1;
+                        m_uiFlags ^= kFlag_Rotate;
+                    }
+                    else if (mode == 1){
+                        m_uiFlags ^= kFlag_Rotate;
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 2;
+                    }
+                    else if (mode == 2){
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 0;
+                    }
                     break;
                     
-                case 'Z':
+                /*case 'Z':
                     m_uiFlags ^= kFlag_Scale;
-                    break;
+                    gestureMode = false;
+                    break;*/
                     
                 case 'S':
                     saveSurfSets();
@@ -428,11 +447,11 @@ public:
     {
         m_aStrState[0] = String::empty;
         m_aStrState[1] = String::empty;
-        m_aStrState[2] = String::empty;
+        //m_aStrState[2] = String::empty;
         
         m_aStrState[0]  << "[T]ransparency: " << LeapUtil::BoolToStr( m_uiFlags & kFlag_Transparent );
-        m_aStrState[1]  << "[R]otate: "    << LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
-        m_aStrState[2]  << "[Z]oom: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
+        m_aStrState[1]  << "[N]ext Mode: "    << mode;//LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
+        //m_aStrState[2]  << "[Z]oom: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
         
     }
     
@@ -568,13 +587,13 @@ public:
         
         g.setColour( Colours::orange );
         
-        for ( int i = 2, uiTotalWidth = 0; i >= 0; i-- )
+        for ( int i = 1, uiTotalWidth = 0; i >= 0; i-- )
         {
             if ( !m_aStrState[i].isEmpty() )
             {
                 const uint32_t uiStrWidth = g.getCurrentFont().getStringWidth( m_aStrState[i] );
                 
-                if ( (i < 3) && (m_uiFlags & kFlag_Automatic) )
+                if ( (i < 2) && (m_uiFlags & kFlag_Automatic) )
                 {
                     const uint32_t uiXformFlags = (kFlag_Transparent << i)|(kFlag_AutoDetectedTranslate << i);
                     const bool bDidTransform =  (m_uiFlags & uiXformFlags) == uiXformFlags;
@@ -646,6 +665,122 @@ public:
         bool bShouldTranslate = true;
         bool bShouldRotate    = true;
         bool bShouldScale     = true;
+        
+        const Leap::GestureList gestures = frame.gestures();
+        if(gestures.count() > 0) {
+            Leap::Gesture gesture = gestures[0];
+            
+            switch (gesture.type()) {
+                case Leap::Gesture::TYPE_CIRCLE:
+                {
+                    if (mode == 0){
+                        Leap::CircleGesture circle = gesture;
+                        std::string clockwiseness;
+                        if (gesture.id() != lastCircle){
+                            lastCircle = gesture.id();
+                            if (frame.fingers().count() <= 1){
+                                if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
+                                    surfacePointerRight(0);
+                                    clockwiseness = "clockwise";
+                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                } else {
+                                    surfacePointerLeft(0);
+                                    clockwiseness = "counterclockwise";
+                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                }
+                            }
+                            else{
+                                if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
+                                    surfacePointerRight(1);
+                                    clockwiseness = "clockwise";
+                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                } else {
+                                    surfacePointerLeft(1);
+                                    clockwiseness = "counterclockwise";
+                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                }
+                            }
+                        }
+                        
+                        /*
+                         // Calculate angle swept since last frame
+                         float sweptAngle = 0;
+                         if (circle.state() != Leap::Gesture::STATE_START) {
+                         //Leap::CircleGesture previousUpdate = CircleGesture(getController().frame(1).gesture(circle.id()));
+                         //sweptAngle = (circle.progress() - previousUpdate.progress()) * 2 * PI;
+                         }
+                         std::cout << "Circle id: " << gesture.id()
+                         << ", state: " << gesture.state()
+                         << ", progress: " << circle.progress()
+                         << ", radius: " << circle.radius()
+                         << ", angle " << sweptAngle * Leap::RAD_TO_DEG
+                         <<  ", " << clockwiseness << std::endl;
+                         */
+                    }
+                    break;
+                }
+                case Leap::Gesture::TYPE_SWIPE:
+                {
+                    if (mode == 0){
+                        Leap::SwipeGesture swipe = gesture;
+                        std::cout << "Swipe id: " << gesture.id()
+                        << ", state: " << gesture.state()
+                        << ", direction: " << swipe.direction()
+                        << ", speed: " << swipe.speed() << std::endl;
+                        if (gesture.id() != lastSwipe && !frame.fingers().isEmpty()){
+                            lastSwipe = gesture.id();
+                            if (swipe.direction().x > 0){
+                                groupPointerRight();
+                            }
+                            else{
+                                groupPointerLeft();
+                            }
+                        }
+                    }
+                    break;
+                }
+                case Leap::Gesture::TYPE_KEY_TAP:
+                {
+                    Leap::KeyTapGesture tap = gesture;
+                    std::cout << "Key Tap id: " << gesture.id()
+                    << ", state: " << gesture.state()
+                    << ", position: " << tap.position()
+                    << ", direction: " << tap.direction()<< std::endl;
+                    /*if (mode == 0){
+                        mode = 1;
+                        m_uiFlags ^= kFlag_Rotate;
+                    }
+                    else if (mode == 1){
+                        m_uiFlags ^= kFlag_Rotate;
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 2;
+                    }
+                    else if (mode == 2){
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 0;
+                    }*/
+                    //m_uiFlags ^= kFlag_Rotate;
+                    //m_uiFlags ^= kFlag_Scale;
+                    break;
+                }
+                case Leap::Gesture::TYPE_SCREEN_TAP:
+                {
+                    if (mode == 0){
+                        Leap::ScreenTapGesture screentap = gesture;
+                        std::cout << "Screen Tap id: " << gesture.id()
+                        << ", state: " << gesture.state()
+                        << ", position: " << screentap.position()
+                        << ", direction: " << screentap.direction()<< std::endl;
+                        moveSurface();
+                    }
+                    break;
+                }
+                default:
+                    std::cout << "Unknown gesture type." << std::endl;
+                    break;
+            }
+        }
+        
         
         m_uiFlags &= ~(kFlags_AutoDetectedTransforms);
         
@@ -996,7 +1131,7 @@ private:
     String                      m_strUpdateFPS;
     String                      m_strRenderFPS;
     String                      m_strHelp;
-    String                      m_aStrState[3];
+    String                      m_aStrState[2];
     String                      m_strGroup;
     String                      m_strIndividual;
     String                      m_strPrompt;
@@ -1078,6 +1213,13 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
         }
         surfsInSet.push_back(surfaces);
     }
+    getController().enableGesture(Leap::Gesture::TYPE_CIRCLE);
+    getController().enableGesture(Leap::Gesture::TYPE_KEY_TAP);
+    getController().enableGesture(Leap::Gesture::TYPE_SCREEN_TAP);
+    getController().enableGesture(Leap::Gesture::TYPE_SWIPE);
+    //getController().config().setFloat("Gesture.Swipe.MinLength", 1200.0);
+    //getController().config().setFloat("Gesture.Swipe.MinVelocity", 1000);
+    //getController().config().save();
     m_pMainWindow = new MotionVisualizerWindow();
 }
 
