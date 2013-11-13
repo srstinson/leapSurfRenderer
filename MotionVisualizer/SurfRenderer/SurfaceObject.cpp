@@ -6,6 +6,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "SurfaceObject.h"
+//#include <GLUT/glut.h>
+//#include "LeapUtilGL.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -13,13 +16,13 @@
 
 SurfaceObject::SurfaceObject(int numPts, double * ptsAndNorms, int numTris, int * inputTris, bool elimIntCavities)
 {
+    colorFlag = false;
 	renderable = true;
 	///get the sizes
 	numPoints = numPts;
 	numTriangles = numTris;
 	highlights = NULL;
 	edges = NULL;
-	colors = NULL;
 	
 	int * tris;
 
@@ -31,7 +34,8 @@ SurfaceObject::SurfaceObject(int numPts, double * ptsAndNorms, int numTris, int 
 	surfaceNormals = new double[3*numPoints];
 	triangles = new int[3*numTriangles];
 	centroid = new double[3];  centroid[0] = 0.0;  centroid[1] = 0.0;  centroid[2] = 0.0;
-
+    colors = new double[3*numPoints];
+    
 	int i = 0;
 	///map in the data
 	for(i = 0; i<numPoints; i++){
@@ -114,7 +118,7 @@ SurfaceObject::SurfaceObject(int numPts, double * ptsAndNorms, int numTris, int 
 		triangleNormals[3*i+2] = tempVec[2];
 		delete[](tempVec);
 	}
-	delete[](cross); delete[](tempNormal);
+    delete[](cross); delete[](tempNormal);
 	delete[](p0); 	delete[](p1); 	delete[](p2); 
 	delete[](v1); 	delete[](v2); 
 }
@@ -125,7 +129,7 @@ SurfaceObject::SurfaceObject(int numPts, double * pts, double * norms, int numTr
 	int i = 0;
 	numPoints = numPts;
 	numTriangles = numTris;
-	colors = NULL;
+    colorFlag = false;
 
 	/////calculate the centroid	
 	centroid = new double[3];	centroid[0] = 0;	centroid[1] = 0;	centroid[2] = 0;	
@@ -155,23 +159,21 @@ SurfaceObject::SurfaceObject(int numPts, double * pts, double * norms, int numTr
 	}
 }
 
-
-
-
-
-
-
-
 SurfaceObject::~SurfaceObject()
 {
+    //std::cout<<"DEALLOCATED"<<std::endl;
 	delete[](surfacePoints);
 	delete[](surfaceNormals);
 	delete[](triangles);
 	delete[](centroid);
+    delete[](colors);
+    delete[](triangleNormals);
 }
 
 
-
+void SurfaceObject::dispose(){
+    delete this;
+}
 
 ///returns the coords of the requested triangle
 ///returns null if out of range.
@@ -380,9 +382,8 @@ void SurfaceObject::addColors(double * c)
 //	printf("OMFGASD: %lf %lf %lf\n", c[0], c[1], c[2] );
 
 	if(c == NULL){return;}
-	
-	colors = new double[3*numPoints];
-	int i = 0;
+    colorFlag = true;
+    int i = 0;
 	for(i = 0; i<3*numPoints; i++){
 //		printf("c[%i] = %lf\n", i, c[i]);
 		colors[i] = c[i];
@@ -404,7 +405,7 @@ void SurfaceObject::addColors(double * c)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifdef OPENGL_RENDERING
+//#ifdef OPENGL_RENDERING
 
 void SurfaceObject::draw(bool drawPoints, bool drawLines, bool drawTransparent, bool pocketView, double * offset, double * c)
 {
@@ -549,7 +550,7 @@ void SurfaceObject::draw(bool drawPoints, bool drawLines, bool drawTransparent, 
 			glVertex3f( s*(surfacePoints [3*pt3+0]-cent[0]),s*(surfacePoints [3*pt3+1]-cent[1]),s*(surfacePoints [3*pt3+2]-cent[2]) );
 		}
 		else{
-			if(colors != NULL){
+			if(colorFlag == true){
 				glColor4f( colors[3*pt1+0],		colors[3*pt1+1],		colors[3*pt1+2], 1.0 );
 				glNormal3f( surfaceNormals[3*pt1+0],		surfaceNormals[3*pt1+1],		surfaceNormals[3*pt1+2] );
 				glVertex3f( surfacePoints [3*pt1+0]-cent[0],surfacePoints [3*pt1+1]-cent[1],surfacePoints [3*pt1+2]-cent[2] );
@@ -651,6 +652,6 @@ void SurfaceObject::draw(bool drawPoints, bool drawLines, bool drawTransparent, 
 
 }
 
-#endif
+//#endif
 /////////////////////////////
 

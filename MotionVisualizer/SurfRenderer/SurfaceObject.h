@@ -10,6 +10,7 @@
 class SurfaceObject  
 {
 public:
+    bool colorFlag;
 	bool renderable;
 	double * centroid;
 	int numPoints;
@@ -23,11 +24,13 @@ public:
 
 	double * colors;			///optional colors, initialized only through separate request.  One vector for each pt.
 
-	SurfaceObject(int numPts, double * ptsAndNorms, int numTris, int * inputTris, bool elimIntCavities);
+    SurfaceObject(int numPts, double * ptsAndNorms, int numTris, int * inputTris, bool elimIntCavities);
 	SurfaceObject(int numPts, double * pts, double * norms, int numTris, int * tris, double * triangleNorms);
 
 	virtual ~SurfaceObject();
 
+    void dispose();
+    
 	///returns the coords of the requested triangle
 	///returns null if out of range.
 	///notice that the triangle must be formatted in this way in the array (3 then 3 then 3)
@@ -53,9 +56,9 @@ public:
 
 	/////////////////////////////
 	//Rendering, only if compiling with OpenGL
-	#ifdef OPENGL_RENDERING
+	//#ifdef OPENGL_RENDERING
 	void draw(bool drawPoints, bool drawLines, bool drawTransparent, bool pocketView, double * offset, double * c);
-	#endif
+	//#endif
 	/////////////////////////////
 
 

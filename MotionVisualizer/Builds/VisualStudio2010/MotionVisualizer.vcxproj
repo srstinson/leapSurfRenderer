@@ -43,6 +43,9 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(LibraryPath);..\..\..\..\LeapSDK\lib\x86</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(ProjectDir)..\..\Source\;${ProjectDir)..\..\SurfRenderer\</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -136,6 +139,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\LeapSDK\util\LeapUtil.cpp" />
     <ClCompile Include="..\..\..\..\LeapSDK\util\LeapUtilGL.cpp" />
+    <ClCompile Include="..\..\Source\dirent.cpp" />
+    <ClCompile Include="..\..\Source\GeometricRecognizer.cpp" />
+    <ClCompile Include="..\..\Source\GestureRecognitionEngine.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\..\ThirdParty\JUCE\modules\juce_core\text\juce_CharacterFunctions.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -948,6 +954,7 @@
     <ClCompile Include="..\..\..\ThirdParty\JUCE\modules\juce_gui_basics\juce_gui_basics.cpp" />
     <ClCompile Include="..\..\..\ThirdParty\JUCE\modules\juce_gui_extra\juce_gui_extra.cpp" />
     <ClCompile Include="..\..\..\ThirdParty\JUCE\modules\juce_opengl\juce_opengl.cpp" />
+    <ClCompile Include="..\..\Source\SurfaceSet.cpp" />
     <ClCompile Include="..\..\SurfRenderer\aminoAcid.cpp" />
     <ClCompile Include="..\..\SurfRenderer\atomBag.cpp" />
     <ClCompile Include="..\..\SurfRenderer\AtomList.cpp" />
@@ -968,7 +975,6 @@
     <ClCompile Include="..\..\SurfRenderer\SurfaceObject.cpp" />
     <ClCompile Include="..\..\SurfRenderer\SurfaceOutput.cpp" />
     <ClCompile Include="..\..\SurfRenderer\_lalgebra.cpp" />
-    <ClCompile Include="SurfaceSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\LeapSDK\util\LeapUtil.h" />
@@ -1312,6 +1318,14 @@
     <ClInclude Include="..\..\..\ThirdParty\JUCE\modules\juce_opengl\juce_opengl.h" />
     <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h" />
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h" />
+    <ClInclude Include="..\..\Source\dirent.h" />
+    <ClInclude Include="..\..\Source\GeometricRecognizer.h" />
+    <ClInclude Include="..\..\Source\GeometricRecognizerTypes.h" />
+    <ClInclude Include="..\..\Source\GestureRecognitionEngine.h" />
+    <ClInclude Include="..\..\Source\GestureTemplate.h" />
+    <ClInclude Include="..\..\Source\PathWriter.h" />
+    <ClInclude Include="..\..\Source\SampleGestures.h" />
+    <ClInclude Include="..\..\Source\SurfaceSet.h" />
     <ClInclude Include="..\..\SurfRenderer\aminoAcid.h" />
     <ClInclude Include="..\..\SurfRenderer\atomBag.h" />
     <ClInclude Include="..\..\SurfRenderer\AtomList.h" />
@@ -1336,7 +1350,6 @@
     <ClInclude Include="..\..\SurfRenderer\SurfaceObject.h" />
     <ClInclude Include="..\..\SurfRenderer\SurfaceOutput.h" />
     <ClInclude Include="..\..\SurfRenderer\_lalgebra.h" />
-    <ClInclude Include="SurfaceSet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.txt" />

@@ -1,33 +1,12 @@
-﻿Build started 10/9/2013 4:40:15 PM.
+﻿Build started 11/13/2013 3:56:54 PM.
      1>Project "C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\MotionVisualizer.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I..\..SurfRenderer /I..\..\JuceLibraryCode /I..\..\..\..\LeapSDK\include /I..\..\..\..\LeapSDK\util /ZI /nologo /W4 /WX- /MP /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D INTERACTIVEMODE /D OPENGL_RENDERING /D WIN32 /D _WINDOWS /D DEBUG /D _DEBUG /D LEAP_SCENE_USE_UTIL_GL=1 /D JUCER_VS2010_78A501D=1 /D _MBCS /Gm- /EHsc /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"Debug\\" /Fd"Debug\\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\Source\Main.cpp
-         Main.cpp
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(636): warning C4100: 'x' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(715): warning C4100: 'local_y' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(715): warning C4100: 'local_x' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(717): warning C4100: 'inside' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(717): warning C4100: 'local_y' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(717): warning C4100: 'local_x' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(719): warning C4100: 'inside' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(719): warning C4100: 'local_y' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(719): warning C4100: 'local_x' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(721): warning C4100: 'modifiers' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(721): warning C4100: 'key' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(723): warning C4100: 'modifiers' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(723): warning C4100: 'key' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(728): warning C4100: 'y' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(728): warning C4100: 'x' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(728): warning C4100: 'state' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(732): warning C4100: 'how' : unreferenced formal parameter
-     1>c:\users\steven\desktop\leapdeveloperkit\examples\motionvisualizer\surfrenderer\glui.h(773): warning C4100: 't' : unreferenced formal parameter
-     1>c:\program files (x86)\microsoft visual studio 11.0\vc\include\gl\glut.h(486): warning C4505: 'glutInit_ATEXIT_HACK' : unreferenced local function has been removed
-     1>c:\program files (x86)\microsoft visual studio 11.0\vc\include\gl\glut.h(503): warning C4505: 'glutCreateWindow_ATEXIT_HACK' : unreferenced local function has been removed
-     1>c:\program files (x86)\microsoft visual studio 11.0\vc\include\gl\glut.h(549): warning C4505: 'glutCreateMenu_ATEXIT_HACK' : unreferenced local function has been removed
-       Link:
+     1>Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug\\MotionVisualizer.exe" /NOLOGO /LIBPATH:..\..\..\..\LeapSDK\lib\x86 leap.lib opengl32.lib glu32.lib glut32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"Debug\\MotionVisualizer.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Debug\MotionVisualizer.lib" /MACHINE:X86 /SAFESEH:NO Debug\resources.res
          Debug\\LeapUtil.obj
          Debug\\LeapUtilGL.obj
+         Debug\\dirent.obj
+         Debug\\GeometricRecognizer.obj
+         Debug\\GestureRecognitionEngine.obj
          Debug\\Main.obj
          Debug\\juce_core.obj
          Debug\\juce_data_structures.obj
@@ -36,6 +15,7 @@
          Debug\\juce_gui_basics.obj
          Debug\\juce_gui_extra.obj
          Debug\\juce_opengl.obj
+         Debug\\SurfaceSet.obj
          Debug\\aminoAcid.obj
          Debug\\atomBag.obj
          Debug\\AtomList.obj
@@ -57,13 +37,10 @@
          Debug\\SurfaceOutput.obj
          Debug\\_lalgebra.obj
          ..\..\SurfRenderer\glui32.lib
-         MotionVisualizer.vcxproj -> C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\.\Debug\MotionVisualizer.exe
-       PostBuildEvent:
-         copy /Y ..\..\..\..\LeapSDK\lib\x86\Leap.dll "C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\Debug\"
-         :VCEnd
-                 1 file(s) copied.
-     1>Done Building Project "C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\MotionVisualizer.vcxproj" (Build target(s)).
+     1>GestureRecognitionEngine.obj : error LNK2001: unresolved external symbol "private: static class DollarRecognizer::GestureRecognitionEngine * DollarRecognizer::GestureRecognitionEngine::self" (?self@GestureRecognitionEngine@DollarRecognizer@@0PAV12@A)
+     1>.\Debug\\MotionVisualizer.exe : fatal error LNK1120: 1 unresolved externals
+     1>Done Building Project "C:\Users\Steven\Desktop\LeapDeveloperKit\Examples\MotionVisualizer\Builds\VisualStudio2010\MotionVisualizer.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:02.85
+Time Elapsed 00:00:00.51

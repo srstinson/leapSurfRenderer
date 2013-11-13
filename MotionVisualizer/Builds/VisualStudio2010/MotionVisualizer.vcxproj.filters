@@ -829,27 +829,70 @@
     <ClCompile Include="..\..\..\ThirdParty\JUCE\modules\juce_core\zip\juce_ZipFile.cpp">
       <Filter>Juce</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SurfRenderer\_lalgebra.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\aminoAcid.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\atomBag.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\AtomList.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\atomRadiusLookup.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\caList.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\funclib.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\GeometryParser.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\mathlib.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\ObjRenderer.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\outputFile.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\PdbAtom.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\pdbParser.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\PocketAlignment.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\prime.c" />
-    <ClCompile Include="..\..\SurfRenderer\Renderer.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\set.c" />
-    <ClCompile Include="..\..\SurfRenderer\StdAfx.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\SurfaceObject.cpp" />
-    <ClCompile Include="..\..\SurfRenderer\SurfaceOutput.cpp" />
-    <ClCompile Include="SurfaceSet.cpp" />
+    <ClCompile Include="..\..\Source\dirent.cpp" />
+    <ClCompile Include="..\..\Source\SurfaceSet.cpp" />
+    <ClCompile Include="..\..\Source\GeometricRecognizer.cpp" />
+    <ClCompile Include="..\..\SurfRenderer\_lalgebra.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\aminoAcid.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\atomBag.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\AtomList.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\atomRadiusLookup.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\caList.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\funclib.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\GeometryParser.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\mathlib.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\ObjRenderer.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\outputFile.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\PdbAtom.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\pdbParser.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\PocketAlignment.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\prime.c">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\Renderer.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\set.c">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\StdAfx.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\SurfaceObject.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SurfRenderer\SurfaceOutput.cpp">
+      <Filter>SurfRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GestureRecognitionEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\LeapSDK\util\LeapUtil.h" />
@@ -1867,31 +1910,88 @@
     <ClInclude Include="..\..\..\ThirdParty\JUCE\modules\juce_core\zip\juce_ZipFile.h">
       <Filter>Juce</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SurfRenderer\_lalgebra.h" />
-    <ClInclude Include="..\..\SurfRenderer\aminoAcid.h" />
-    <ClInclude Include="..\..\SurfRenderer\atomBag.h" />
-    <ClInclude Include="..\..\SurfRenderer\AtomList.h" />
-    <ClInclude Include="..\..\SurfRenderer\atomRadiusLookup.h" />
-    <ClInclude Include="..\..\SurfRenderer\caList.h" />
-    <ClInclude Include="..\..\SurfRenderer\conf.h" />
-    <ClInclude Include="..\..\SurfRenderer\defs.h" />
-    <ClInclude Include="..\..\SurfRenderer\funclib.h" />
-    <ClInclude Include="..\..\SurfRenderer\GeometryParser.h" />
-    <ClInclude Include="..\..\SurfRenderer\glui.h" />
-    <ClInclude Include="..\..\SurfRenderer\glut.h" />
-    <ClInclude Include="..\..\SurfRenderer\mathlib.h" />
-    <ClInclude Include="..\..\SurfRenderer\ObjRenderer.h" />
-    <ClInclude Include="..\..\SurfRenderer\outputFile.h" />
-    <ClInclude Include="..\..\SurfRenderer\PdbAtom.h" />
-    <ClInclude Include="..\..\SurfRenderer\pdbParser.h" />
-    <ClInclude Include="..\..\SurfRenderer\PocketAlignment.h" />
-    <ClInclude Include="..\..\SurfRenderer\prime.h" />
-    <ClInclude Include="..\..\SurfRenderer\Renderer.h" />
-    <ClInclude Include="..\..\SurfRenderer\set.h" />
-    <ClInclude Include="..\..\SurfRenderer\StdAfx.h" />
-    <ClInclude Include="..\..\SurfRenderer\SurfaceObject.h" />
-    <ClInclude Include="..\..\SurfRenderer\SurfaceOutput.h" />
-    <ClInclude Include="SurfaceSet.h" />
+    <ClInclude Include="..\..\Source\dirent.h" />
+    <ClInclude Include="..\..\Source\SurfaceSet.h" />
+    <ClInclude Include="..\..\Source\GeometricRecognizer.h" />
+    <ClInclude Include="..\..\Source\GeometricRecognizerTypes.h" />
+    <ClInclude Include="..\..\Source\GestureTemplate.h" />
+    <ClInclude Include="..\..\Source\SampleGestures.h" />
+    <ClInclude Include="..\..\SurfRenderer\_lalgebra.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\aminoAcid.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\atomBag.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\AtomList.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\atomRadiusLookup.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\caList.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\conf.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\defs.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\funclib.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\GeometryParser.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\glui.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\glut.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\mathlib.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\ObjRenderer.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\outputFile.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PathWriter.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\PdbAtom.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\pdbParser.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\PocketAlignment.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\prime.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\Renderer.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\set.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\StdAfx.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\SurfaceObject.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SurfRenderer\SurfaceOutput.h">
+      <Filter>SurfRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GestureRecognitionEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\resources.rc" />
@@ -1919,14 +2019,21 @@
     <None Include="..\..\..\ThirdParty\JUCE\modules\juce_graphics\juce_module_info">
       <Filter>Juce</Filter>
     </None>
-    <None Include="..\..\SurfRenderer\glut.def" />
+    <None Include="..\..\SurfRenderer\glut.def">
+      <Filter>SurfRenderer</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Juce">
       <UniqueIdentifier>{b890f98c-c935-4356-a947-6bdaa6ba3b41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SurfRenderer">
+      <UniqueIdentifier>{55ff0cff-7271-4510-9a53-02db7240b408}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\SurfRenderer\glui32.lib" />
+    <Library Include="..\..\SurfRenderer\glui32.lib">
+      <Filter>SurfRenderer</Filter>
+    </Library>
   </ItemGroup>
 </Project>
