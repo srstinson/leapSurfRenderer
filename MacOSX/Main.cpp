@@ -14,6 +14,12 @@
 #include <math.h>
 #include <dirent.h>
 #include <iostream>
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include <time.h>
+#include "GestureRecognitionEngine.h"
+
 
 class MotionVisualizerWindow;
 class OpenGLCanvas;
@@ -39,9 +45,6 @@ int main_window;		///referenced by GLUI to get back to the main window
 
 float aspectRatio;
 float * obj_pos;
-float * obj_rot;
-float * obj_rotx;
-float * obj_roty;
 int * drawAxes;
 int * useCentroid;
 //GLUI_EditText * Renderer::glui_input_file_field;
@@ -74,7 +77,7 @@ int keyFlag;
 int background;
 
 std::vector<std::string> surfSets;
-std::vector<std::vector<std::string>> surfsInSet;
+std::vector<std::vector<std::string> > surfsInSet;
 
 std::string currentFile;
 std::string comparedFile;
@@ -88,8 +91,18 @@ int lastCircle = 0;
 
 int mode = 0;
 
+int xyFlag = 0;
+
 float angleX = 0;
 float angleY = 0;
+
+glm::quat myQuaternion;
+
+time_t timerStart;
+
+DollarRecognizer::GestureRecognitionEngine* recognitionEngine;
+
+int frameCount = 0;
 
 //==============================================================================
 class MotionVisualizerApplication  : public JUCEApplication
@@ -98,10 +111,12 @@ public:
     //==============================================================================
     MotionVisualizerApplication()
     {
+        std::cout<<"ok"<<std::endl;
     }
     
     ~MotionVisualizerApplication()
     {
+        std::cout<<"bye"<<std::endl;
     }
     
     //==============================================================================
@@ -480,27 +495,35 @@ public:
         
         if (direction == 1){
             if(angleDirectionX > 0){
-                angleY = fmod((angleY + 0.05),2*PI);
+                //angleY = fmod((angleY + 0.05),2*PI);
+                //angleY = fmod((angleY + 0.05*(180/PI)),360);
+                glm::vec3 eulerAngles(0, 0.05, 0);
+                myQuaternion = glm::quat(eulerAngles) * myQuaternion;
+                //xyFlag = 0;
             }
             else{
-                angleY = fmod((angleY - 0.05),2*PI);
+                //angleY = fmod((angleY - 0.05),2*PI);
+                //angleY = fmod((angleY - 0.05*(180/PI)),360);
+                glm::vec3 eulerAngles(0, -0.05, 0);
+                myQuaternion = glm::quat(eulerAngles) * myQuaternion;
+                //xyFlag = 0;
             }
-            obj_roty[0] = cos(angleY);
-            obj_roty[2] = -1*sin(angleY);
-            obj_roty[8] = sin(angleY);
-            obj_roty[10] = cos(angleY);
         }
         else if (direction == 2){
             if(angleDirectionY > 0){
-                angleX = fmod((angleX + 0.05),2*PI);
+                //angleX = fmod((angleX + 0.05),2*PI);
+                //angleX = fmod((angleX + 0.05*(180/PI)),360);
+                glm::vec3 eulerAngles(0.05, 0, 0);
+                myQuaternion = glm::quat(eulerAngles) * myQuaternion;
+                //xyFlag = 1;
             }
             else{
-                angleX = fmod((angleX - 0.05),2*PI);
+                //angleX = fmod((angleX - 0.05),2*PI);
+                //angleX = fmod((angleX - 0.05*(180/PI)),360);
+                glm::vec3 eulerAngles(-0.05, 0, 0);
+                myQuaternion = glm::quat(eulerAngles) * myQuaternion;
+                //xyFlag = 1;
             }
-            obj_rotx[5] = cos(angleX);
-            obj_rotx[6] = sin(angleX);
-            obj_rotx[9] = -1*sin(angleX);
-            obj_rotx[10] = cos(angleX);
         }
     }
     
@@ -510,7 +533,7 @@ public:
         (void)e;
         (void)wheel;
         static const float kfMinScale = 0.1f;
-        static const float kfMaxScale = 2.0f;
+        static const float kfMaxScale = 3.0f;
         bool scaleDirection = wheel.deltaY >= 0;
         if(scaleDirection){
             m_fTotalMotionScale = LeapUtil::Clamp(  m_fTotalMotionScale * float(1.05),kfMinScale,kfMaxScale );
@@ -659,17 +682,64 @@ public:
         
         static const float kfMinScale = 0.1f;
         
-        static const float kfMaxScale = 2.0f;
+        static const float kfMaxScale = 3.0f;
         
         //If automatic motion type detection is enabled, check if motion probabilities are above threshold amounts
         bool bShouldTranslate = true;
         bool bShouldRotate    = true;
         bool bShouldScale     = true;
         
+        //recognitionEngine current coord to the Gesture Recognition Engine
+        if(frameCount < 5){
+            frameCount++;
+        }
+        else{
+            frameCount = 0;
+        }
+        if(frameCount == 0){
+            if (frame.fingers().count() == 1){
+            recognitionEngine->updateCoord(frame);
+            }
+            else if(frame.fingers().count() == 0){
+                string dollarGestureName = recognitionEngine->recognize().name;
+                double dollarGestureScore = recognitionEngine->recognize().score;
+                if(dollarGestureName != "Unknown"){
+                    std::cout<<dollarGestureName<<" "<<dollarGestureScore<<std::endl;
+                }
+                if(dollarGestureName == "Arrow"){
+                    if (mode == 0){
+                        mode = 1;
+                        m_uiFlags ^= kFlag_Rotate;
+                    }
+                    else if (mode == 1){
+                        m_uiFlags ^= kFlag_Rotate;
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 2;
+                    }
+                    else if (mode == 2){
+                        m_uiFlags ^= kFlag_Scale;
+                        mode = 0;
+                    }
+                    updateStateStr();
+                }
+                else if(dollarGestureName == "Pigtail" && mode == 0){
+                    moveSurface();
+                }
+                else if(dollarGestureName == "CheckMark" && mode == 0){
+                    saveSurfSets();
+                }
+                else if(dollarGestureName == "Rectangle"){
+                    m_uiFlags ^= kFlag_Transparent;
+                    updateStateStr();
+                }
+                recognitionEngine->clear();
+            }
+        }
+        
         const Leap::GestureList gestures = frame.gestures();
         if(gestures.count() > 0) {
             Leap::Gesture gesture = gestures[0];
-            
+            time_t timerEnd = time(NULL);
             switch (gesture.type()) {
                 case Leap::Gesture::TYPE_CIRCLE:
                 {
@@ -678,26 +748,26 @@ public:
                         std::string clockwiseness;
                         if (gesture.id() != lastCircle){
                             lastCircle = gesture.id();
-                            if (frame.fingers().count() <= 1){
+                            if (frame.fingers().count() == 2){
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
                                     surfacePointerRight(0);
                                     clockwiseness = "clockwise";
-                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 } else {
                                     surfacePointerLeft(0);
                                     clockwiseness = "counterclockwise";
-                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 }
                             }
-                            else{
+                            else if(frame.fingers().count() == 3){
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
                                     surfacePointerRight(1);
                                     clockwiseness = "clockwise";
-                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 } else {
                                     surfacePointerLeft(1);
                                     clockwiseness = "counterclockwise";
-                                    std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
+                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 }
                             }
                         }
@@ -721,13 +791,14 @@ public:
                 }
                 case Leap::Gesture::TYPE_SWIPE:
                 {
-                    if (mode == 0){
+                    if (mode == 0  && frame.fingers().count() >= 5){
                         Leap::SwipeGesture swipe = gesture;
-                        std::cout << "Swipe id: " << gesture.id()
+                        /*std::cout << "Swipe id: " << gesture.id()
                         << ", state: " << gesture.state()
                         << ", direction: " << swipe.direction()
                         << ", speed: " << swipe.speed() << std::endl;
-                        if (gesture.id() != lastSwipe && !frame.fingers().isEmpty()){
+                        std::cout<<difftime(timerEnd,timerStart)<<std::endl;*/
+                        if (gesture.id() != lastSwipe && difftime(timerEnd,timerStart) >= 2 && !frame.fingers().isEmpty()){
                             lastSwipe = gesture.id();
                             if (swipe.direction().x > 0){
                                 groupPointerRight();
@@ -735,17 +806,18 @@ public:
                             else{
                                 groupPointerLeft();
                             }
+                            timerStart = time(NULL);
                         }
                     }
                     break;
                 }
                 case Leap::Gesture::TYPE_KEY_TAP:
                 {
-                    Leap::KeyTapGesture tap = gesture;
-                    std::cout << "Key Tap id: " << gesture.id()
+                    //Leap::KeyTapGesture tap = gesture;
+                    /*std::cout << "Key Tap id: " << gesture.id()
                     << ", state: " << gesture.state()
                     << ", position: " << tap.position()
-                    << ", direction: " << tap.direction()<< std::endl;
+                    << ", direction: " << tap.direction()<< std::endl;*/
                     /*if (mode == 0){
                         mode = 1;
                         m_uiFlags ^= kFlag_Rotate;
@@ -765,18 +837,18 @@ public:
                 }
                 case Leap::Gesture::TYPE_SCREEN_TAP:
                 {
-                    if (mode == 0){
+                   /*if (mode == 0){
                         Leap::ScreenTapGesture screentap = gesture;
                         std::cout << "Screen Tap id: " << gesture.id()
                         << ", state: " << gesture.state()
                         << ", position: " << screentap.position()
                         << ", direction: " << screentap.direction()<< std::endl;
                         moveSurface();
-                    }
+                    }*/
                     break;
                 }
                 default:
-                    std::cout << "Unknown gesture type." << std::endl;
+                    //std::cout << "Unknown gesture type." << std::endl;
                     break;
             }
         }
@@ -802,7 +874,7 @@ public:
         }
         
         //Update the rotation
-        if (( m_uiFlags & kFlag_Rotate ) && bShouldRotate && !frame.fingers().isEmpty())
+        if (( m_uiFlags & kFlag_Rotate ) && bShouldRotate && frame.fingers().count() >= 5)
         {
             double angleDirectionX = frame.translation(m_lastFrame).x;
             double angleDirectionY = frame.translation(m_lastFrame).z;
@@ -820,33 +892,33 @@ public:
             
             if (direction == 1){
                 if(angleDirectionX > 0){
-                    angleY = fmod((angleY + 0.05),2*PI);
+                    //angleY = fmod((angleY + 0.05*(180 / PI)),360);
+                    glm::vec3 eulerAngles(0, 0.05, 0);
+                    myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
                 else{
-                    angleY = fmod((angleY - 0.05),2*PI);
+                    //angleY = fmod((angleY - 0.05*(180 / PI)),360);
+                    glm::vec3 eulerAngles(0, -0.05, 0);
+                    myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
-                obj_roty[0] = cos(angleY);
-                obj_roty[2] = -1*sin(angleY);
-                obj_roty[8] = sin(angleY);
-                obj_roty[10] = cos(angleY);
             }
             else if (direction == 2){
                 if(angleDirectionY > 0){
-                    angleX = fmod((angleX + 0.05),2*PI);
+                    //angleX = fmod((angleX + 0.05*(180 / PI)),360);
+                    glm::vec3 eulerAngles(0.05, 0, 0);
+                    myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
                 else{
-                    angleX = fmod((angleX - 0.05),2*PI);
+                    //angleX = fmod((angleX - 0.05*(180 / PI)),360);
+                    glm::vec3 eulerAngles(-0.05, 0, 0);
+                    myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
-                obj_rotx[5] = cos(angleX);
-                obj_rotx[6] = sin(angleX);
-                obj_rotx[9] = -1*sin(angleX);
-                obj_rotx[10] = cos(angleX);
             }
             
         }
         
         //Update the scale
-        if (( m_uiFlags & kFlag_Scale ) && bShouldScale && !frame.fingers().isEmpty())
+        if (( m_uiFlags & kFlag_Scale ) && bShouldScale && frame.fingers().count() >= 5)
         {
             bool scaleDirection = frame.translation(m_lastFrame).y >= 0;
             if(scaleDirection){
@@ -895,7 +967,7 @@ public:
         //Draw the infinite grid
         static const float kfSide = kfNumGrids*kfGridScale*0.5f;
         static const float kfAtten = kfGridScale*kfGridScale;
-        
+        /*
         glLineWidth(1.0f);
         glBegin(GL_LINES);
         
@@ -937,7 +1009,7 @@ public:
         }
         
         glEnd();
-        
+        */
         background = 0;
         
         glEnable(GL_COLOR_MATERIAL);
@@ -972,9 +1044,24 @@ public:
                 printf("File not found! Try again.\n");
             }
             else{
-                glMultMatrixf(obj_rotx);
-                glMultMatrixf(obj_roty);
-                glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
+                /*if(xyFlag == 0){
+                    glRotatef(angleY,0,1,0);
+                    //glRotatef(angleX,1,0,0);
+                }
+                else{
+                    glRotatef(angleX,1,0,0);
+                    //glRotatef(angleY,0,1,0);
+                }*/
+                
+                /*glm::vec3 eulerAngles(angleX, angleY, 0);
+                glm::quat myQuaternion(eulerAngles);*/
+                glm::mat4 rotationMatrix = glm::toMat4(myQuaternion);
+                glMultMatrixf(glm::value_ptr(rotationMatrix));
+                //glMultMatrixf(obj_rotx);
+                //glRotatef(angleX,1,0,0);
+                //glRotatef(angleY,0,1,0);
+                //glMultMatrixf(obj_roty);
+                //glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
                 glPushMatrix(); ///store global position on the matrix stack
                 
                 glBegin(GL_LINES);
@@ -1187,16 +1274,6 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
     (void) commandLine;
     // Do your application's initialisation code here..
     currentFile = "";
-    obj_rotx = new float[16];
-    obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
-    obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
-    obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
-    obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
-    obj_roty = new float[16];
-    obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
-    obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
-    obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
-    obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;
     keyFlag = 0;
     surfSets = GetAllFilesWithExtension(".SURFSET");
     for(int i =  0; i < surfSets.size(); i++){
@@ -1217,9 +1294,13 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
     getController().enableGesture(Leap::Gesture::TYPE_KEY_TAP);
     getController().enableGesture(Leap::Gesture::TYPE_SCREEN_TAP);
     getController().enableGesture(Leap::Gesture::TYPE_SWIPE);
-    //getController().config().setFloat("Gesture.Swipe.MinLength", 1200.0);
+    //getController().config().setFloat("Gesture.Swipe.MinLength", 1500.0);
     //getController().config().setFloat("Gesture.Swipe.MinVelocity", 1000);
     //getController().config().save();
+    glm::vec3 eulerAngles(0, 0, 0);
+    myQuaternion = glm::quat(eulerAngles);
+    timerStart = time(NULL);
+    recognitionEngine->Instance();
     m_pMainWindow = new MotionVisualizerWindow();
 }
 
@@ -1428,6 +1509,7 @@ void saveSurfSets(){
         saveFile << fileText;
         saveFile.close();
     }
+    cout<<"Saved"<<endl;
 }
 
 //==============================================================================
