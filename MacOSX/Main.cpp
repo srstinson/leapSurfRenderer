@@ -34,6 +34,7 @@ void surfacePointerRight(int surfFoc);
 void surfacePointerLeft(int surfFoc);
 void moveSurface();
 void saveSurfSets();
+void newSet();
 
 static const float kfNumGrids   = 15.0f;
 static const float kfGridScale  = 120.0f;
@@ -81,6 +82,7 @@ std::vector<std::vector<std::string> > surfsInSet;
 
 std::string currentFile;
 std::string comparedFile;
+std::string newSetName;
 
 int surfSetIndex = 0;
 int surfIndex1 = -1;
@@ -137,7 +139,7 @@ public:
     //==============================================================================
     const String getApplicationName()
     {
-        return "Leap Motion Visualizer";
+        return "LeapRenderer";
     }
     
     const String getApplicationVersion()
@@ -235,9 +237,11 @@ public:
         
         m_fLeftRightEyeShift = 2.0f;
         
-        m_strSave = "[S]ave";
+        m_strSave = "Up to Date";
         
         m_strFile = "[F]ile: ";
+        
+        m_strSet = "Set: ";
     }
     
     ~OpenGLCanvas()
@@ -352,7 +356,7 @@ public:
                     //m_uiFlags ^= (kFlag_Help | kFlag_FPS);
                     return true;
                     
-                case 'N':
+                case 'M':
                     if (mode == 0){
                         mode = 1;
                         m_uiFlags ^= kFlag_Rotate;
@@ -372,9 +376,15 @@ public:
                     m_uiFlags ^= kFlag_Scale;
                     gestureMode = false;
                     break;*/
-                    
+                case 'N':
+                    if(surfSetIndex == 0 && (currentFile != "" || comparedFile != "")){
+                        m_strSave = "Not [S]aved";
+                        keyFlag = 3;
+                    }
+                    break;
                 case 'S':
                     saveSurfSets();
+                    m_strSave = "Up to Date";
                     break;
                     
                 case 'T':
@@ -397,8 +407,9 @@ public:
                     keyFlag = 2;
                     break;
                     
-                case 'M':
+                case 'P':
                     moveSurface();
+                    m_strSave = "Not [S]aved";
                     break;
                     
                 default:
@@ -411,14 +422,6 @@ public:
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
                 setSurfaces(false);
-                /*obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
-                 obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
-                 obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
-                 obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
-                 obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
-                 obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
-                 obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
-                 obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
@@ -431,18 +434,10 @@ public:
                 std::cout<<cKeyCode<<std::endl;
             }
         }
-        else{
+        else if(keyFlag == 2){
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
                 setSurfaces(false);
-                /*obj_rotx[0] = 1.0;	obj_rotx[1] = 0.0;	obj_rotx[2] = 0.0;	obj_rotx[3] = 0.0;
-                 obj_rotx[4] = 0.0;	obj_rotx[5] = 1.0;	obj_rotx[6] = 0.0;	obj_rotx[7] = 0.0;
-                 obj_rotx[8] = 0.0;	obj_rotx[9] = 0.0;	obj_rotx[10] = 1.0;	obj_rotx[11] = 0.0;
-                 obj_rotx[12] = 0.0;	obj_rotx[13] = 0.0;	obj_rotx[14] = 0.0;	obj_rotx[15] = 1.0;
-                 obj_roty[0] = 1.0;	obj_roty[1] = 0.0;	obj_roty[2] = 0.0;	obj_roty[3] = 0.0;
-                 obj_roty[4] = 0.0;	obj_roty[5] = 1.0;	obj_roty[6] = 0.0;	obj_roty[7] = 0.0;
-                 obj_roty[8] = 0.0;	obj_roty[9] = 0.0;	obj_roty[10] = 1.0;	obj_roty[11] = 0.0;
-                 obj_roty[12] = 0.0;	obj_roty[13] = 0.0;	obj_roty[14] = 0.0;	obj_roty[15] = 1.0;*/
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
@@ -452,6 +447,22 @@ public:
             else{
                 char cKeyCode = keyPress.getTextCharacter();
                 comparedFile += cKeyCode;
+                std::cout<<cKeyCode<<std::endl;
+            }
+        }
+        else if(keyFlag == 3){
+            int iKeyCode = keyPress.getKeyCode();
+            if(iKeyCode == KeyPress::returnKey){
+                newSet();
+                keyFlag = 0;
+            }
+            else if(iKeyCode == KeyPress::backspaceKey){
+                if (newSetName.size() > 0)  newSetName.resize(newSetName.size () - 1);
+                //std::cout<<"Yep"<<std::endl;
+            }
+            else if(keyPress.isValid()){
+                char cKeyCode = keyPress.getTextCharacter();
+                newSetName += cKeyCode;
                 std::cout<<cKeyCode<<std::endl;
             }
         }
@@ -582,11 +593,20 @@ public:
         //g.drawSingleLineText( m_strPrompt, iMargin, iBaseLine );
         m_strFile += currentFile.c_str();
         m_strCompFile += comparedFile.c_str();
+        if(surfSetIndex != 0){
+            m_strSet += surfSets[surfSetIndex-1].c_str();
+        }
+        else if(keyFlag == 3){
+            cout<<newSetName.c_str()<<endl;
+            m_strSet += newSetName.c_str();
+        }
         g.drawSingleLineText( m_strSave, iMargin, iBaseLine);
         g.drawSingleLineText( m_strFile, iMargin, iBaseLine + iLineStep );
         g.drawSingleLineText( m_strCompFile, iMargin, iBaseLine + 2*iLineStep );
+        g.drawSingleLineText( m_strSet, iMargin, iBaseLine + 3*iLineStep );
         m_strFile = "[F]ile: ";
         m_strCompFile = "[C]ompare File: ";
+        m_strSet = "Set: ";
         
         if ( m_uiFlags & kFlag_FPS )
         {
@@ -724,13 +744,22 @@ public:
                 }
                 else if(dollarGestureName == "Pigtail" && mode == 0){
                     moveSurface();
+                    m_strSave = "Not [S]aved";
                 }
                 else if(dollarGestureName == "CheckMark" && mode == 0){
                     saveSurfSets();
+                    m_strSave = "Up to Date";
                 }
                 else if(dollarGestureName == "Rectangle"){
                     m_uiFlags ^= kFlag_Transparent;
                     updateStateStr();
+                }
+                else if(dollarGestureName == "Caret"){
+                    if(surfSetIndex == 0 && (currentFile != "" || comparedFile != "")){
+                        m_strSave = "Not [S]aved";
+                        keyFlag = 3;
+                        keyPressed( KeyPress() );
+                    }
                 }
                 recognitionEngine->clear();
             }
@@ -1225,6 +1254,7 @@ private:
     String                      m_strSave;
     String                      m_strFile;
     String                      m_strCompFile;
+    String                      m_strSet;
     uint32_t                    m_uiFlags;
     CriticalSection             m_renderMutex;
 };
@@ -1240,7 +1270,7 @@ class MotionVisualizerWindow : public DocumentWindow
 public:
     //==============================================================================
     MotionVisualizerWindow()
-    : DocumentWindow ("Leap Motion Visualizer",
+    : DocumentWindow ("LeapRenderer",
                       Colours::lightgrey,
                       DocumentWindow::allButtons,
                       true)
@@ -1340,7 +1370,7 @@ void setSurfaces(Boolean loadSurfaces){
     if(surfIndex1 != -1 && surfSetIndex > 0){
         currentFile = surfsInSet[surfSetIndex-1][surfIndex1];
     }
-    if(surfIndex2 != -1 && surfSetIndex > 0){
+    if(surfIndex2 != -1 && surfSetIndex > 0 && surfsInSet[surfSetIndex-1].size() > 1){
         comparedFile = surfsInSet[surfSetIndex-1][surfIndex2];
     }
     if(currentFile != ""){
@@ -1510,6 +1540,25 @@ void saveSurfSets(){
         saveFile.close();
     }
     cout<<"Saved"<<endl;
+}
+
+void newSet(){
+    mutex.enter();
+    surfSets.push_back(newSetName);
+    vector<string> tempSet;
+    if(currentFile != ""){
+        tempSet.push_back(currentFile);
+    }
+    if(comparedFile != ""){
+        tempSet.push_back(comparedFile);
+    }
+    cout<<"OkHERE"<<endl;
+    surfsInSet.push_back(tempSet);
+    surfSetIndex = surfSets.size();
+    surfIndex1 = 0;
+    surfIndex2 = 0;
+    newSetName = "";
+    mutex.exit();
 }
 
 //==============================================================================
