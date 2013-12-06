@@ -106,6 +106,13 @@ DollarRecognizer::GestureRecognitionEngine* recognitionEngine;
 
 int frameCount = 0;
 
+bool fingerFlag = false;
+
+float previousX = 0;
+float previousY = 0;
+
+int pauseCounter = 0;
+
 //==============================================================================
 class MotionVisualizerApplication  : public JUCEApplication
 {
@@ -412,6 +419,15 @@ public:
                     m_strSave = "Not [S]aved";
                     break;
                     
+                case 'V':
+                    if(fingerFlag){
+                        fingerFlag = false;
+                    }
+                    else{
+                        fingerFlag = true;
+                    }
+                    break;
+                    
                 default:
                     return false;
             }
@@ -710,17 +726,44 @@ public:
         bool bShouldScale     = true;
         
         //recognitionEngine current coord to the Gesture Recognition Engine
-        if(frameCount < 5){
+        
+        
+        
+        if(frameCount < 3){
             frameCount++;
         }
         else{
             frameCount = 0;
         }
+        
+        bool gestureFlag = false;
+        
         if(frameCount == 0){
             if (frame.fingers().count() == 1){
-            recognitionEngine->updateCoord(frame);
+                float x,y;
+                
+                Leap::FingerList fingers = frame.fingers();
+                
+                x = fingers[0].tipPosition().x;
+                y = -fingers[0].tipPosition().y;
+                
+                float distance = pow((previousX - x),2) + pow((previousY - y),2);
+                                
+                if(distance > 5){
+                    recognitionEngine->updateCoord(frame);
+                }
+                else{
+                    pauseCounter++;
+                    std::cout<<"AHOY"<<std::endl;
+                    if (pauseCounter == 3){
+                        gestureFlag = true;
+                        pauseCounter = 0;
+                    }
+                }
+                previousX = x;
+                previousY = y;
             }
-            else if(frame.fingers().count() == 0){
+            if(frame.fingers().count() == 0 || gestureFlag){
                 string dollarGestureName = recognitionEngine->recognize().name;
                 double dollarGestureScore = recognitionEngine->recognize().score;
                 if(dollarGestureName != "Unknown"){
@@ -1175,11 +1218,47 @@ public:
             LeapUtilGL::drawAxes();
         }
         
+        if(fingerFlag){
+            drawPointables(frame);
+        }
+        
         {
             ScopedLock renderLock(m_renderMutex);
             
             // draw the text overlay
             renderOpenGL2D();
+        }
+    }
+    
+    void drawPointables(Leap::Frame frame){
+        
+        const Leap::FingerList& pointables = frame.fingers();
+        
+        
+        for ( size_t i = 0, e = pointables.count(); i < e; i++ ){
+            
+            const Leap::Finger&  pointable   = pointables[i];
+
+            Leap::Vector stabilizedPosition = pointable.stabilizedTipPosition();
+            
+            Leap::InteractionBox iBox = frame.interactionBox();
+            Leap::Vector normalizedPosition = iBox.normalizePoint(stabilizedPosition);
+            float x0 = normalizedPosition.x * 20;
+            float y0 = normalizedPosition.y * 15;
+            
+            
+            //cout<<"coords:"<<x0<<" "<<y0<<endl;
+            
+            glBegin(GL_TRIANGLE_FAN);
+            
+            glVertex2f(x0, y0);
+            
+            for( int angle = 0; angle <= 360; angle += 5){
+                glVertex2f(x0 + sin(angle * PI/180) * 0.25, y0 + cos(angle* PI/180) * 0.25);
+            }
+            
+            glEnd();
+        
         }
     }
     
@@ -1282,6 +1361,9 @@ public:
         
         // And show it!
         setVisible (true);
+        
+        cout<<"Height: "<<getBounds().getHeight()<<endl;
+        cout<<"Width: "<<getBounds().getWidth()<<endl;
         
         getChildComponent(0)->grabKeyboardFocus();
     }
@@ -1552,7 +1634,6 @@ void newSet(){
     if(comparedFile != ""){
         tempSet.push_back(comparedFile);
     }
-    cout<<"OkHERE"<<endl;
     surfsInSet.push_back(tempSet);
     surfSetIndex = surfSets.size();
     surfIndex1 = 0;

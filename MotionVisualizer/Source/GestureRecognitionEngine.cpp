@@ -37,7 +37,7 @@ namespace DollarRecognizer {
 
 		//Leap::Frame frame = controller.frame();
 		
-		if (frame.pointables().count() > 0) {
+		if (frame.fingers().count() > 0) {
 			//Leap::Pointable p = frame.pointables()[0];
 			//Leap::Screen s = controller.locatedScreens().closestScreenHit(p);
 			float x,y;
@@ -46,7 +46,7 @@ namespace DollarRecognizer {
 			//x = (v.x * s.widthPixels() - x) * 0.25f;
 			//y = ((1 - v.y) * s.heightPixels() - y) * 0.25f;
 
-            Leap::PointableList fingers = frame.pointables();
+            Leap::FingerList fingers = frame.fingers();
             
             x = fingers[0].tipPosition().x;
             y = -fingers[0].tipPosition().y;
