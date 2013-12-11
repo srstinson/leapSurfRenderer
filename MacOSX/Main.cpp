@@ -5,113 +5,10 @@
  * https://developer.leapmotion.com/sdk_agreement, or another agreement between *
  * Leap Motion and you, your company or other organization.                     *
  \******************************************************************************/
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "Leap.h"
-#include "LeapUtilGL.h"
-#include <cctype>
-#include "StdAfx.h"
-#include <string>
-#include <math.h>
-#include <dirent.h>
-#include <iostream>
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include <time.h>
-#include "GestureRecognitionEngine.h"
-
+#include "Main.h"
 
 class MotionVisualizerWindow;
 class OpenGLCanvas;
-
-CriticalSection mutex;
-
-std::vector<std::string> GetAllFilesWithExtension(const std::string & ext);
-void setSurfaces(Boolean loadSurfaces);
-void groupPointerRight();
-void groupPointerLeft();
-void surfacePointerRight(int surfFoc);
-void surfacePointerLeft(int surfFoc);
-void moveSurface();
-void saveSurfSets();
-void newSet();
-
-static const float kfNumGrids   = 15.0f;
-static const float kfGridScale  = 120.0f;
-
-int main_window;		///referenced by GLUI to get back to the main window
-
-//GLUI windows
-//GLUI * Renderer::glui_controls;
-
-float aspectRatio;
-float * obj_pos;
-int * drawAxes;
-int * useCentroid;
-//GLUI_EditText * Renderer::glui_input_file_field;
-//GLUI_EditText * Renderer::glui_output_file_field;
-
-SurfaceObject * surf = NULL;
-SurfaceObject * surfCompared = NULL;
-
-///my stuff
-char * outputFileName;
-char * inputFileName;
-
-//	static int numProts;
-set_t drawProt;		//int ** drawProt;
-set_t lists;			//AtomList ** lists;
-set_t list_pos;		//float ** list_pos;
-set_t list_rot;		//float ** list_rot;
-
-///surface-based rendering
-//	static int numSurfs;
-set_t drawSurf;		//int ** drawSurf;
-set_t transSurf;		//int ** transSurf;
-set_t surfs;			//SurfaceObject ** surfs;
-set_t surf_pos;		//float ** surf_pos;
-set_t surf_rot;		//float ** surf_rot;
-double * centroid;	///double * centroid
-
-int keyFlag;
-
-int background;
-
-std::vector<std::string> surfSets;
-std::vector<std::vector<std::string> > surfsInSet;
-
-std::string currentFile;
-std::string comparedFile;
-std::string newSetName;
-
-int surfSetIndex = 0;
-int surfIndex1 = -1;
-int surfIndex2 = -1;
-
-int lastSwipe = 0;
-int lastCircle = 0;
-
-int mode = 0;
-
-int xyFlag = 0;
-
-float angleX = 0;
-float angleY = 0;
-
-glm::quat myQuaternion;
-
-time_t timerStart;
-
-DollarRecognizer::GestureRecognitionEngine* recognitionEngine;
-
-int frameCount = 0;
-
-bool fingerFlag = false;
-
-float previousX = 0;
-float previousY = 0;
-
-int pauseCounter = 0;
 
 //==============================================================================
 class MotionVisualizerApplication  : public JUCEApplication
@@ -120,12 +17,10 @@ public:
     //==============================================================================
     MotionVisualizerApplication()
     {
-        std::cout<<"ok"<<std::endl;
     }
     
     ~MotionVisualizerApplication()
     {
-        std::cout<<"bye"<<std::endl;
     }
     
     //==============================================================================
@@ -227,19 +122,6 @@ public:
         
         updateStateStr();
         
-        m_strPrompt = "Press 'H' for help";
-        
-        m_strHelp = "ESC - quit\n"
-        "H - Toggle help and frame rate display\n"
-        "A - Toggle automatic motion tracking\n"
-        "R - Toggle rotation tracking\n"
-        "S - Toggle scale tracking\n"
-        "T - Toggle translation tracking\n"
-        "3 - Toggle red/blue 3D mode\n"
-        "Page Up   - Increase left/right eye separation\n"
-        "Page Down - Decrease left/right eye separation\n"
-        "Space     - Reset the scene and camera";
-        
         m_fTotalMotionScale = 1.0f;
         
         m_fLeftRightEyeShift = 2.0f;
@@ -310,37 +192,37 @@ public:
             
             if ( iKeyCode == KeyPress::rightKey )
             {
-                groupPointerRight();
+                surfaces.groupPointerRight();
                 return true;
             }
             
             if ( iKeyCode == KeyPress::leftKey )
             {
-                groupPointerLeft();
+                surfaces.groupPointerLeft();
                 return true;
             }
             
             if ( iKeyCode == KeyPress::upKey )
             {
-                surfacePointerRight(0);
+                surfaces.surfacePointerRight(0);
                 return true;
             }
             
             if ( iKeyCode == KeyPress::downKey )
             {
-                surfacePointerLeft(0);
+                surfaces.surfacePointerLeft(0);
                 return true;
             }
             
             if ( iKeyCode == '.' )
             {
-                surfacePointerRight(1);
+                surfaces.surfacePointerRight(1);
                 return true;
             }
             
             if ( iKeyCode == ',' )
             {
-                surfacePointerLeft(1);
+                surfaces.surfacePointerLeft(1);
                 return true;
             }
             
@@ -358,11 +240,7 @@ public:
                 case 'A':
                     m_uiFlags ^= kFlag_Automatic;
                     break;
-                    
-                case 'H':
-                    //m_uiFlags ^= (kFlag_Help | kFlag_FPS);
-                    return true;
-                    
+                                        
                 case 'M':
                     if (mode == 0){
                         mode = 1;
@@ -379,18 +257,15 @@ public:
                     }
                     break;
                     
-                /*case 'Z':
-                    m_uiFlags ^= kFlag_Scale;
-                    gestureMode = false;
-                    break;*/
                 case 'N':
-                    if(surfSetIndex == 0 && (currentFile != "" || comparedFile != "")){
+                    if(surfaces.getSurfSetIndex() == 0 && (surfaces.getCurrentFileName() != "" || surfaces.getComparedFileName() != "")){
+                        surfaces.newSet();
                         m_strSave = "Not [S]aved";
                         keyFlag = 3;
                     }
                     break;
                 case 'S':
-                    saveSurfSets();
+                    surfaces.saveSurfSets();
                     m_strSave = "Up to Date";
                     break;
                     
@@ -399,23 +274,23 @@ public:
                     break;
                     
                 case 'F':
-                    currentFile = "";
-                    surfIndex1 = -1;
-                    surfIndex2 = -2;
-                    surfSetIndex = 0;
+                    surfaces.setCurrentFileName("");
+                    surfaces.setSurfIndex(1,-1);
+                    surfaces.setSurfIndex(2,-2);
+                    surfaces.setSurfSetIndex(0);
                     keyFlag = 1;
                     break;
                     
                 case 'C':
-                    comparedFile = "";
-                    surfIndex1 = -1;
-                    surfIndex2 = -2;
-                    surfSetIndex = 0;
+                    surfaces.setComparedFileName("");
+                    surfaces.setSurfIndex(1,-1);
+                    surfaces.setSurfIndex(2,-2);
+                    surfaces.setSurfSetIndex(0);
                     keyFlag = 2;
                     break;
                     
                 case 'P':
-                    moveSurface();
+                    //moveSurface();
                     m_strSave = "Not [S]aved";
                     break;
                     
@@ -437,49 +312,61 @@ public:
         else if(keyFlag == 1){
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
-                setSurfaces(false);
+                surfaces.setSurfaces(false);
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
-                if (currentFile.size() > 0)  currentFile.resize(currentFile.size () - 1);
-                //std::cout<<"Yep"<<std::endl;
+                string currentFile = surfaces.getCurrentFileName();
+                if (currentFile.size() > 0){
+                    currentFile.resize(currentFile.size () - 1);
+                    surfaces.setCurrentFileName(currentFile);
+                }
             }
             else{
                 char cKeyCode = keyPress.getTextCharacter();
+                string currentFile = surfaces.getCurrentFileName();
                 currentFile += cKeyCode;
-                std::cout<<cKeyCode<<std::endl;
+                surfaces.setCurrentFileName(currentFile);
             }
         }
         else if(keyFlag == 2){
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
-                setSurfaces(false);
+                surfaces.setSurfaces(false);
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
-                if (comparedFile.size() > 0)  comparedFile.resize(comparedFile.size () - 1);
-                //std::cout<<"Yep"<<std::endl;
+                string comparedFile = surfaces.getComparedFileName();
+                if (comparedFile.size() > 0){
+                    comparedFile.resize(comparedFile.size () - 1);
+                    surfaces.setComparedFileName(comparedFile);
+                }
             }
             else{
+                string comparedFile = surfaces.getComparedFileName();
                 char cKeyCode = keyPress.getTextCharacter();
                 comparedFile += cKeyCode;
-                std::cout<<cKeyCode<<std::endl;
+                surfaces.setComparedFileName(comparedFile);
             }
         }
         else if(keyFlag == 3){
             int iKeyCode = keyPress.getKeyCode();
             if(iKeyCode == KeyPress::returnKey){
-                newSet();
+                surfaces.newSet();
                 keyFlag = 0;
             }
             else if(iKeyCode == KeyPress::backspaceKey){
-                if (newSetName.size() > 0)  newSetName.resize(newSetName.size () - 1);
-                //std::cout<<"Yep"<<std::endl;
+                string setName = surfaces.getSetFileName();
+                if (setName.size() > 0){
+                    setName.resize(setName.size () - 1);
+                    surfaces.setSetFileName(setName);
+                }
             }
             else if(keyPress.isValid()){
+                string setName = surfaces.getSetFileName();
                 char cKeyCode = keyPress.getTextCharacter();
-                newSetName += cKeyCode;
-                std::cout<<cKeyCode<<std::endl;
+                setName += cKeyCode;
+                surfaces.setSetFileName(setName);
             }
         }
         return true;
@@ -489,11 +376,9 @@ public:
     {
         m_aStrState[0] = String::empty;
         m_aStrState[1] = String::empty;
-        //m_aStrState[2] = String::empty;
         
         m_aStrState[0]  << "[T]ransparency: " << LeapUtil::BoolToStr( m_uiFlags & kFlag_Transparent );
-        m_aStrState[1]  << "[N]ext Mode: "    << mode;//LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
-        //m_aStrState[2]  << "[Z]oom: "     << LeapUtil::BoolToStr( m_uiFlags & kFlag_Scale );
+        m_aStrState[1]  << "Next [M]ode: "    << mode;//LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
         
     }
     
@@ -522,34 +407,22 @@ public:
         
         if (direction == 1){
             if(angleDirectionX > 0){
-                //angleY = fmod((angleY + 0.05),2*PI);
-                //angleY = fmod((angleY + 0.05*(180/PI)),360);
                 glm::vec3 eulerAngles(0, 0.05, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
-                //xyFlag = 0;
             }
             else{
-                //angleY = fmod((angleY - 0.05),2*PI);
-                //angleY = fmod((angleY - 0.05*(180/PI)),360);
                 glm::vec3 eulerAngles(0, -0.05, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
-                //xyFlag = 0;
             }
         }
         else if (direction == 2){
             if(angleDirectionY > 0){
-                //angleX = fmod((angleX + 0.05),2*PI);
-                //angleX = fmod((angleX + 0.05*(180/PI)),360);
                 glm::vec3 eulerAngles(0.05, 0, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
-                //xyFlag = 1;
             }
             else{
-                //angleX = fmod((angleX - 0.05),2*PI);
-                //angleX = fmod((angleX - 0.05*(180/PI)),360);
                 glm::vec3 eulerAngles(-0.05, 0, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
-                //xyFlag = 1;
             }
         }
     }
@@ -606,15 +479,15 @@ public:
         g.setFont( static_cast<float>(iFontSize) );
         
         g.setColour( Colours::salmon );
-        //g.drawSingleLineText( m_strPrompt, iMargin, iBaseLine );
-        m_strFile += currentFile.c_str();
-        m_strCompFile += comparedFile.c_str();
+        m_strFile += surfaces.getCurrentFileName().c_str();
+        m_strCompFile += surfaces.getComparedFileName().c_str();
+        int surfSetIndex = surfaces.getSurfSetIndex();
         if(surfSetIndex != 0){
+            vector<string> surfSets = surfaces.getSurfSets();
             m_strSet += surfSets[surfSetIndex-1].c_str();
         }
         else if(keyFlag == 3){
-            cout<<newSetName.c_str()<<endl;
-            m_strSet += newSetName.c_str();
+            m_strSet += surfaces.getSetFileName().c_str();
         }
         g.drawSingleLineText( m_strSave, iMargin, iBaseLine);
         g.drawSingleLineText( m_strFile, iMargin, iBaseLine + iLineStep );
@@ -629,16 +502,6 @@ public:
             g.setColour( Colours::seagreen );
             g.drawSingleLineText( m_strUpdateFPS, iMargin, iBaseLine + iLineStep );
             g.drawSingleLineText( m_strRenderFPS, iMargin, iBaseLine + iLineStep*2 );
-        }
-        
-        if ( m_uiFlags & kFlag_Help )
-        {
-            g.setFont( m_fixedFont );
-            g.setColour( Colours::slateblue );
-            g.drawMultiLineText( m_strHelp,
-                                iMargin,
-                                iBaseLine + iLineStep * 3,
-                                rectBounds.getWidth() - iMargin*2 );
         }
         
         g.setFont( origFont );
@@ -668,11 +531,15 @@ public:
             }
         }
         m_strGroup = "Group: ";
-        //std::cout<<surfSetIndex<<std::endl;
+        vector<string> surfSets = surfaces.getSurfSets();
         for(int i = 0; i < surfSets.size() + 1; i++){
-            if(i ==surfSetIndex){m_strGroup += "[";}
+            if(i == surfSetIndex){
+                m_strGroup += "[";
+            }
             m_strGroup += i;
-            if(i ==surfSetIndex){m_strGroup += "]";}
+            if(i ==surfSetIndex){
+                m_strGroup += "]";
+            }
             m_strGroup += " ";
         }
         g.setColour( Colours::orange );
@@ -681,8 +548,11 @@ public:
                              rectBounds.getBottom() - 2*(iFontSize*2),
                              Justification::horizontallyCentred );
         m_strIndividual = "Surfs: ";
-        //std::cout<<surfSets.size()<<std::endl;
+
         if(surfSetIndex >= 1){
+            vector<vector<string>> surfsInSet = surfaces.getSurfsInSet();
+            int surfIndex1 = surfaces.getSurfIndex(1);
+            int surfIndex2 = surfaces.getSurfIndex(2);
             for(int i = 0; i < surfsInSet[surfSetIndex-1].size(); i++){
                 if(i ==surfIndex1){m_strIndividual += "[";}
                 if(i ==surfIndex2){m_strIndividual += "{";}
@@ -754,7 +624,6 @@ public:
                 }
                 else{
                     pauseCounter++;
-                    std::cout<<"AHOY"<<std::endl;
                     if (pauseCounter == 3){
                         gestureFlag = true;
                         pauseCounter = 0;
@@ -786,11 +655,11 @@ public:
                     updateStateStr();
                 }
                 else if(dollarGestureName == "Pigtail" && mode == 0){
-                    moveSurface();
+                    surfaces.moveSurface();
                     m_strSave = "Not [S]aved";
                 }
                 else if(dollarGestureName == "CheckMark" && mode == 0){
-                    saveSurfSets();
+                    surfaces.saveSurfSets();
                     m_strSave = "Up to Date";
                 }
                 else if(dollarGestureName == "Rectangle"){
@@ -798,6 +667,9 @@ public:
                     updateStateStr();
                 }
                 else if(dollarGestureName == "Caret"){
+                    string currentFile = surfaces.getCurrentFileName();
+                    string comparedFile = surfaces.getComparedFileName();
+                    int surfSetIndex = surfaces.getSurfSetIndex();
                     if(surfSetIndex == 0 && (currentFile != "" || comparedFile != "")){
                         m_strSave = "Not [S]aved";
                         keyFlag = 3;
@@ -822,42 +694,23 @@ public:
                             lastCircle = gesture.id();
                             if (frame.fingers().count() == 2){
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
-                                    surfacePointerRight(0);
+                                    surfaces.surfacePointerRight(0);
                                     clockwiseness = "clockwise";
-                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 } else {
-                                    surfacePointerLeft(0);
+                                    surfaces.surfacePointerLeft(0);
                                     clockwiseness = "counterclockwise";
-                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 }
                             }
                             else if(frame.fingers().count() == 3){
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
-                                    surfacePointerRight(1);
+                                    surfaces.surfacePointerRight(1);
                                     clockwiseness = "clockwise";
-                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 } else {
-                                    surfacePointerLeft(1);
+                                    surfaces.surfacePointerLeft(1);
                                     clockwiseness = "counterclockwise";
-                                    //std::cout << "Circle id: " << gesture.id() <<  ", " << clockwiseness << std::endl;
                                 }
                             }
                         }
-                        
-                        /*
-                         // Calculate angle swept since last frame
-                         float sweptAngle = 0;
-                         if (circle.state() != Leap::Gesture::STATE_START) {
-                         //Leap::CircleGesture previousUpdate = CircleGesture(getController().frame(1).gesture(circle.id()));
-                         //sweptAngle = (circle.progress() - previousUpdate.progress()) * 2 * PI;
-                         }
-                         std::cout << "Circle id: " << gesture.id()
-                         << ", state: " << gesture.state()
-                         << ", progress: " << circle.progress()
-                         << ", radius: " << circle.radius()
-                         << ", angle " << sweptAngle * Leap::RAD_TO_DEG
-                         <<  ", " << clockwiseness << std::endl;
-                         */
                     }
                     break;
                 }
@@ -865,62 +718,20 @@ public:
                 {
                     if (mode == 0  && frame.fingers().count() >= 5){
                         Leap::SwipeGesture swipe = gesture;
-                        /*std::cout << "Swipe id: " << gesture.id()
-                        << ", state: " << gesture.state()
-                        << ", direction: " << swipe.direction()
-                        << ", speed: " << swipe.speed() << std::endl;
-                        std::cout<<difftime(timerEnd,timerStart)<<std::endl;*/
                         if (gesture.id() != lastSwipe && difftime(timerEnd,timerStart) >= 2 && !frame.fingers().isEmpty()){
                             lastSwipe = gesture.id();
                             if (swipe.direction().x > 0){
-                                groupPointerRight();
+                                surfaces.groupPointerRight();
                             }
                             else{
-                                groupPointerLeft();
+                                surfaces.groupPointerLeft();
                             }
                             timerStart = time(NULL);
                         }
                     }
                     break;
                 }
-                case Leap::Gesture::TYPE_KEY_TAP:
-                {
-                    //Leap::KeyTapGesture tap = gesture;
-                    /*std::cout << "Key Tap id: " << gesture.id()
-                    << ", state: " << gesture.state()
-                    << ", position: " << tap.position()
-                    << ", direction: " << tap.direction()<< std::endl;*/
-                    /*if (mode == 0){
-                        mode = 1;
-                        m_uiFlags ^= kFlag_Rotate;
-                    }
-                    else if (mode == 1){
-                        m_uiFlags ^= kFlag_Rotate;
-                        m_uiFlags ^= kFlag_Scale;
-                        mode = 2;
-                    }
-                    else if (mode == 2){
-                        m_uiFlags ^= kFlag_Scale;
-                        mode = 0;
-                    }*/
-                    //m_uiFlags ^= kFlag_Rotate;
-                    //m_uiFlags ^= kFlag_Scale;
-                    break;
-                }
-                case Leap::Gesture::TYPE_SCREEN_TAP:
-                {
-                   /*if (mode == 0){
-                        Leap::ScreenTapGesture screentap = gesture;
-                        std::cout << "Screen Tap id: " << gesture.id()
-                        << ", state: " << gesture.state()
-                        << ", position: " << screentap.position()
-                        << ", direction: " << screentap.direction()<< std::endl;
-                        moveSurface();
-                    }*/
-                    break;
-                }
                 default:
-                    //std::cout << "Unknown gesture type." << std::endl;
                     break;
             }
         }
@@ -930,19 +741,13 @@ public:
         
         if ( m_uiFlags & kFlag_Automatic )
         {
-            bShouldTranslate = false;//frame.translationProbability(m_lastFrame) > 0.40;
+            bShouldTranslate = false;
             bShouldRotate    = frame.translationProbability(m_lastFrame)    > 0.60;
             bShouldScale     = frame.translationProbability(m_lastFrame)    > 0.80;
             
             m_uiFlags |= bShouldTranslate ? kFlag_AutoDetectedTranslate : 0;
             m_uiFlags |= bShouldRotate ? kFlag_AutoDetectedRotate : 0;
             m_uiFlags |= bShouldScale ? kFlag_AutoDetectedScale : 0;
-        }
-        
-        //Update the translation in the current reference frame
-        if (( m_uiFlags & kFlag_Transparent ) && bShouldTranslate)
-        {
-            //m_vTotalMotionTranslation += m_mtxTotalMotionRotation.rigidInverse().transformDirection(frame.translation(m_lastFrame));
         }
         
         //Update the rotation
@@ -964,24 +769,20 @@ public:
             
             if (direction == 1){
                 if(angleDirectionX > 0){
-                    //angleY = fmod((angleY + 0.05*(180 / PI)),360);
                     glm::vec3 eulerAngles(0, 0.05, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
                 else{
-                    //angleY = fmod((angleY - 0.05*(180 / PI)),360);
                     glm::vec3 eulerAngles(0, -0.05, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
             }
             else if (direction == 2){
                 if(angleDirectionY > 0){
-                    //angleX = fmod((angleX + 0.05*(180 / PI)),360);
                     glm::vec3 eulerAngles(0.05, 0, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
                 else{
-                    //angleX = fmod((angleX - 0.05*(180 / PI)),360);
                     glm::vec3 eulerAngles(-0.05, 0, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
@@ -1031,57 +832,8 @@ public:
         
         Leap::Vector vColor( 0.5, 1, 1 );
         
-        //Set the 3D grid transformation matrix
-        //        glMultMatrixf(m_mtxTotalMotionRotation.toArray4x4());
-        //        glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
         glScalef(m_fTotalMotionScale, m_fTotalMotionScale, m_fTotalMotionScale);
         
-        //Draw the infinite grid
-        static const float kfSide = kfNumGrids*kfGridScale*0.5f;
-        static const float kfAtten = kfGridScale*kfGridScale;
-        /*
-        glLineWidth(1.0f);
-        glBegin(GL_LINES);
-        
-        for ( float i = -kfSide; i < kfSide; i += kfGridScale)
-        {
-            for ( float j = -kfSide; j < kfSide; j += kfGridScale)
-            {
-                for ( float k = -kfSide; k < kfSide; k += kfGridScale)
-                {
-                    const float fIntens1 = kfAtten/((m_vTotalMotionTranslation + Leap::Vector(i, j, k)).magnitudeSquared() + kfAtten);
-                    const float fIntens2 = kfAtten/((m_vTotalMotionTranslation + Leap::Vector(i+kfGridScale, j, k)).magnitudeSquared() + kfAtten);
-                    const float fIntens3 = kfAtten/((m_vTotalMotionTranslation + Leap::Vector(i, j+kfGridScale, k)).magnitudeSquared() + kfAtten);
-                    const float fIntens4 = kfAtten/((m_vTotalMotionTranslation + Leap::Vector(i, j, k+kfGridScale)).magnitudeSquared() + kfAtten);
-                    
-                    const Leap::Vector vColor1 = vColor * fIntens1;
-                    const Leap::Vector vColor2 = vColor * fIntens2;
-                    const Leap::Vector vColor3 = vColor * fIntens3;
-                    const Leap::Vector vColor4 = vColor * fIntens4;
-                    
-                    glColor3fv( vColor1.toFloatPointer() );
-                    glVertex3f(i, j, k);
-                    
-                    glColor3fv( vColor2.toFloatPointer() );
-                    glVertex3f(i + kfGridScale, j, k);
-                    
-                    glColor3fv( vColor1.toFloatPointer() );
-                    glVertex3f(i, j, k);
-                    
-                    glColor3fv( vColor3.toFloatPointer() );
-                    glVertex3f(i, j + kfGridScale, k);
-                    
-                    glColor3fv( vColor1.toFloatPointer() );
-                    glVertex3f(i, j, k);
-                    
-                    glColor3fv( vColor4.toFloatPointer() );
-                    glVertex3f(i, j, k + kfGridScale);
-                }
-            }
-        }
-        
-        glEnd();
-        */
         background = 0;
         
         glEnable(GL_COLOR_MATERIAL);
@@ -1110,60 +862,9 @@ public:
         glLineWidth(LINEWIDTH);
         
         
-        if (currentFile.compare("") != 0 && keyFlag == 0){
-            
-            if(surf == NULL){
-                printf("File not found! Try again.\n");
-            }
-            else{
-                /*if(xyFlag == 0){
-                    glRotatef(angleY,0,1,0);
-                    //glRotatef(angleX,1,0,0);
-                }
-                else{
-                    glRotatef(angleX,1,0,0);
-                    //glRotatef(angleY,0,1,0);
-                }*/
-                
-                /*glm::vec3 eulerAngles(angleX, angleY, 0);
-                glm::quat myQuaternion(eulerAngles);*/
-                glm::mat4 rotationMatrix = glm::toMat4(myQuaternion);
-                glMultMatrixf(glm::value_ptr(rotationMatrix));
-                //glMultMatrixf(obj_rotx);
-                //glRotatef(angleX,1,0,0);
-                //glRotatef(angleY,0,1,0);
-                //glMultMatrixf(obj_roty);
-                //glTranslatef(m_vTotalMotionTranslation.x, m_vTotalMotionTranslation.y, m_vTotalMotionTranslation.z);
-                glPushMatrix(); ///store global position on the matrix stack
-                
-                glBegin(GL_LINES);
-                glColor3f(1.0f, 0.0f, 0.0f);	glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 1000.0, 0.0, 0.0 );
-                glColor3f(0.0f, 1.0f, 0.0f);	glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 1000.0, 0.0 );
-                glColor3f(0.0f, 0.0f, 1.0f);	glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 0.0, 1000.0 );
-                glEnd();
-                glBegin(GL_POINTS);
-                glColor3f(1.0f, 1.0f, 1.0f);	glVertex3f( 0.0, 0.0, 0.0 );
-                glColor3f(1.0f, 0.0f, 0.0f);	glVertex3f( 1.0, 0.0, 0.0 );  glVertex3f( 2.0, 0.0, 0.0 );
-                glColor3f(0.0f, 1.0f, 0.0f);	glVertex3f( 0.0, 1.0, 0.0 );  glVertex3f( 0.0, 2.0, 0.0 );
-                glColor3f(0.0f, 0.0f, 1.0f);	glVertex3f( 0.0, 0.0, 1.0 );  glVertex3f( 0.0, 0.0, 2.0 );
-                glEnd();
-                
-                glTranslatef(-surf->centroid[0], -surf->centroid[1], -surf->centroid[2]);
-                mutex.enter();
-                surf->draw(false, false, (m_uiFlags & kFlag_Transparent), true, NULL, NULL);
-                if(comparedFile != ""){
-                    //glTranslatef(-surfCompared->centroid[0], -surfCompared->centroid[1], -surfCompared->centroid[2]);
-                    surfCompared->draw(false, false, true, true, NULL, NULL);
-                }
-                mutex.exit();
-                glPopMatrix();
-            }
-        }
+        surfaces.draw(myQuaternion,keyFlag,(m_uiFlags & kFlag_Transparent));
     }
     
-    // data should be drawn here but no heavy calculations done.
-    // any major calculations that only need to be updated per leap data frame
-    // should be handled in update and cached in members.
     void renderOpenGL()
     {
         {
@@ -1246,9 +947,6 @@ public:
             float x0 = normalizedPosition.x * 20;
             float y0 = normalizedPosition.y * 15;
             
-            
-            //cout<<"coords:"<<x0<<" "<<y0<<endl;
-            
             glBegin(GL_TRIANGLE_FAN);
             
             glVertex2f(x0, y0);
@@ -1325,11 +1023,9 @@ private:
     LeapUtil::RollingAverage<>  m_avgRenderDeltaTime;
     String                      m_strUpdateFPS;
     String                      m_strRenderFPS;
-    String                      m_strHelp;
     String                      m_aStrState[2];
     String                      m_strGroup;
     String                      m_strIndividual;
-    String                      m_strPrompt;
     String                      m_strSave;
     String                      m_strFile;
     String                      m_strCompFile;
@@ -1361,10 +1057,7 @@ public:
         
         // And show it!
         setVisible (true);
-        
-        cout<<"Height: "<<getBounds().getHeight()<<endl;
-        cout<<"Width: "<<getBounds().getWidth()<<endl;
-        
+                
         getChildComponent(0)->grabKeyboardFocus();
     }
     
@@ -1385,261 +1078,14 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
 {
     (void) commandLine;
     // Do your application's initialisation code here..
-    currentFile = "";
     keyFlag = 0;
-    surfSets = GetAllFilesWithExtension(".SURFSET");
-    for(int i =  0; i < surfSets.size(); i++){
-        std::vector<std::string> surfaces;
-        ifstream file;
-        file.open(surfSets[i].c_str());
-        std::string surfLoc;
-        while (file.good())
-        {
-            getline (file, surfLoc, ',');
-            surfLoc = std::string(surfLoc, 0, surfLoc.length());
-            std::cout<<surfLoc<<std::endl;
-            surfaces.push_back(surfLoc);
-        }
-        surfsInSet.push_back(surfaces);
-    }
     getController().enableGesture(Leap::Gesture::TYPE_CIRCLE);
-    getController().enableGesture(Leap::Gesture::TYPE_KEY_TAP);
-    getController().enableGesture(Leap::Gesture::TYPE_SCREEN_TAP);
     getController().enableGesture(Leap::Gesture::TYPE_SWIPE);
-    //getController().config().setFloat("Gesture.Swipe.MinLength", 1500.0);
-    //getController().config().setFloat("Gesture.Swipe.MinVelocity", 1000);
-    //getController().config().save();
     glm::vec3 eulerAngles(0, 0, 0);
     myQuaternion = glm::quat(eulerAngles);
     timerStart = time(NULL);
     recognitionEngine->Instance();
     m_pMainWindow = new MotionVisualizerWindow();
-}
-
-std::vector<std::string> GetAllFilesWithExtension(const std::string & ext)
-{
-    std::vector<std::string> surfSets2;
-    DIR* dirp = opendir(".");
-    dirent* dp;
-    while ((dp = readdir(dirp)) != NULL){
-        std::string filePathString = dp->d_name;
-        if(filePathString.find(".SURFSET") != filePathString.npos){
-            surfSets2.push_back(filePathString);
-            //std::cout<<filePathString<<std::endl;
-        }
-    }
-    (void)closedir(dirp);
-    
-    return surfSets2;
-}
-
-void setSurfaces(Boolean loadSurfaces){
-    mutex.enter();
-    SurfaceObject * surfTemp = NULL;
-    SurfaceObject * surfTemp2 = NULL;
-    
-    std::cout<<surf<<" "<<surfCompared<<std::endl;
-    
-    if(surf != NULL){
-        surfTemp = surf;
-    }
-    if(surfCompared != NULL){
-        surfTemp2 = surfCompared;
-    }
-    
-    std::cout<<surfTemp<<" "<<surfTemp2<<std::endl;
-    
-    if(surfIndex1 != -1 && surfSetIndex > 0){
-        currentFile = surfsInSet[surfSetIndex-1][surfIndex1];
-    }
-    if(surfIndex2 != -1 && surfSetIndex > 0 && surfsInSet[surfSetIndex-1].size() > 1){
-        comparedFile = surfsInSet[surfSetIndex-1][surfIndex2];
-    }
-    if(currentFile != ""){
-        char *cstr = new char[currentFile.length() + 1];
-        strcpy(cstr, currentFile.c_str());
-        surf = parseGeometryFile(cstr);
-        delete [] cstr;
-    }
-    if(comparedFile != ""){
-        char *cstr = new char[comparedFile.length() + 1];
-        strcpy(cstr, comparedFile.c_str());
-        surfCompared = parseGeometryFile(cstr);
-        delete [] cstr;
-    }
-    
-    if(surfTemp != NULL){
-        if(surf == surfTemp){
-            surf = NULL;
-        }
-        std::cout<<surf<<" "<<surfTemp<<std::endl;
-        surfTemp->dispose();
-    }
-    if(surfTemp2 != NULL){
-        if(surfCompared == surfTemp2){
-            surfCompared = NULL;
-        }
-        std::cout<<surfCompared<<" "<<surfTemp2<<std::endl;
-        surfTemp2->dispose();
-    }
-    mutex.exit();
-}
-
-void groupPointerRight(){
-    if(surfSetIndex == surfSets.size()){
-        surfSetIndex = 0;
-    }
-    else{
-        surfSetIndex++;
-    }
-    if(surfsInSet[surfSetIndex-1].size() >= 1){
-        surfIndex1 = 0;
-    }
-    if(surfsInSet[surfSetIndex-1].size() >= 2){
-        surfIndex2 = 1;
-    }
-    if(surfSetIndex == 0){
-        currentFile = "";
-        comparedFile = "";
-        surfIndex1 = -1;
-        surfIndex2 = -1;
-    }
-    setSurfaces(true);
-}
-
-void groupPointerLeft(){
-    if(surfSetIndex == 0){
-        surfSetIndex = surfSets.size();
-    }
-    else{
-        surfSetIndex--;
-    }
-    if(surfsInSet[surfSetIndex-1].size() >= 1){
-        surfIndex1 = 0;
-    }
-    if(surfsInSet[surfSetIndex-1].size() >= 2){
-        surfIndex2 = 1;
-    }
-    if(surfSetIndex == 0){
-        currentFile = "";
-        comparedFile = "";
-        surfIndex1 = -1;
-        surfIndex2 = -1;
-    }
-    setSurfaces(true);
-}
-
-void surfacePointerRight(int surfFoc){
-    if (surfFoc == 0){
-        if(surfIndex2 != -1){
-            if(surfIndex2 == surfsInSet[surfSetIndex-1].size()-1){
-                surfIndex2 = 0;
-            }
-            else{
-                surfIndex2++;
-            }
-        }
-    }
-    else{
-        if(surfIndex1 != -1){
-            if(surfIndex1 == surfsInSet[surfSetIndex-1].size()-1){
-                surfIndex1 = 0;
-            }
-            else{
-                surfIndex1++;
-            }
-        }
-    }
-    setSurfaces(true);
-}
-
-void surfacePointerLeft(int surfFoc){
-    if (surfFoc == 0){
-        if(surfIndex2 != -1){
-            if(surfIndex2 == 0){
-                surfIndex2 = surfsInSet[surfSetIndex-1].size()-1;
-            }
-            else{
-                surfIndex2--;
-            }
-        }
-    }
-    else{
-        if(surfIndex1 != -1){
-            if(surfIndex1 == 0){
-                surfIndex1 = surfsInSet[surfSetIndex-1].size()-1;
-            }
-            else{
-                surfIndex1--;
-            }
-        }
-    }
-    setSurfaces(true);
-}
-
-void moveSurface(){
-    if(surfIndex1 != -1 && surfSets.size() > 1){
-        surfsInSet[surfSetIndex - 1].erase(surfsInSet[surfSetIndex - 1].begin() + surfIndex1);
-        if(surfSetIndex == surfSets.size()){
-            surfSetIndex = 1;
-        }
-        else{
-            surfSetIndex++;
-        }
-        surfsInSet[surfSetIndex - 1].push_back(currentFile);
-        surfIndex1 = surfsInSet[surfSetIndex - 1].size()-1;
-        surfIndex2 = 0;
-    }
-    else if(surfSets.size() > 0 && currentFile != ""){
-        surfsInSet[0].push_back(currentFile);
-        surfSetIndex = 1;
-        surfIndex1 = surfsInSet[0].size()-1;
-        surfIndex2 = 0;
-    }
-    setSurfaces(true);
-}
-
-void saveSurfSets(){
-    //std::vector<std::string> surfSets;
-    //std::vector<std::vector<std::string>> surfsInSet;
-    for(int i = 0; i < surfSets.size(); i++){
-        std::string setBeingSaved = surfSets[i];
-        std::string fileText = "";
-        std::ofstream saveFile;
-        //char *cstr = new char[setBeingSaved.length() + 1];
-        //strcpy(cstr, setBeingSaved.c_str());
-        //std::cout<<setBeingSaved<<std::endl;
-        saveFile.open(setBeingSaved.c_str());
-        //delete [] cstr;
-        for(int j = 0; j < surfsInSet[i].size(); j++){
-            fileText += surfsInSet[i][j];
-            if (j != surfsInSet[i].size() - 1){
-                fileText += ",";
-            }
-        }
-        //std::cout<<fileText<<std::endl;
-        saveFile << fileText;
-        saveFile.close();
-    }
-    cout<<"Saved"<<endl;
-}
-
-void newSet(){
-    mutex.enter();
-    surfSets.push_back(newSetName);
-    vector<string> tempSet;
-    if(currentFile != ""){
-        tempSet.push_back(currentFile);
-    }
-    if(comparedFile != ""){
-        tempSet.push_back(comparedFile);
-    }
-    surfsInSet.push_back(tempSet);
-    surfSetIndex = surfSets.size();
-    surfIndex1 = 0;
-    surfIndex2 = 0;
-    newSetName = "";
-    mutex.exit();
 }
 
 //==============================================================================
