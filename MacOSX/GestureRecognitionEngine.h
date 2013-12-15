@@ -1,3 +1,8 @@
+/*
+ GestureRecognitionEngine
+ Description: GestureRecognitionEngine acts as an interface between the LeapRenderer main program and the $1 Unistroke Recognizer.
+ */
+
 #include "GeometricRecognizer.h"
 #include <map>
 #include "Leap.h"
@@ -31,6 +36,7 @@ public:
 	/* Add a gesture to the list. */
 	void addGesture(string,Path2D);
     
+    //Clear the gesture path
     void clear();
 };
 }

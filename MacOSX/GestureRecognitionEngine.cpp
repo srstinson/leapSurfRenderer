@@ -1,3 +1,8 @@
+/*
+ GestureRecognitionEngine
+ Description: GestureRecognitionEngine acts as an interface between the LeapRenderer main program and the $1 Unistroke Recognizer.
+ */
+
 #include "GestureRecognitionEngine.h"
 
 static DollarRecognizer::GestureRecognitionEngine* self;
@@ -20,7 +25,6 @@ namespace DollarRecognizer {
 		recentPath = *new Path2D();
 		gestures = *new std::map<string,Path2D>();
 		recognizer.loadTemplates();
-        cout<<"OK!"<<endl;
 
 	}
 
@@ -42,7 +46,6 @@ namespace DollarRecognizer {
             
             x = fingers[0].tipPosition().x;
             y = -fingers[0].tipPosition().y;
-            cout<<x<<" "<<y<<endl;
             
 			if (recentPath.size() == GESTURE_SIZE) {
 				recentPath.erase(recentPath.begin());

@@ -1,6 +1,3 @@
-//#ifndef _SampleGesturesIncluded_
-//#define _SampleGesturesIncluded_
-
 #include "GeometricRecognizerTypes.h"
 
 // TODO: read from a file. This approach is just ugly
@@ -1623,5 +1620,3 @@ namespace DollarRecognizer
 
 	};
 }
-
-//#endif

@@ -17,64 +17,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-///Mmap library. Permits out of core file maintenance for BinFiles.
 
 #include <string.h>
 #include <assert.h>
 #include <math.h>
 #include <time.h>
-#include <ctime>//to seed random num generator
+#include <ctime>
 #include <limits.h>
 #include <float.h>
 #include <fstream.h>
 
-//#ifdef OPENGL_RENDERING
-//#include "glui.h"
-//#endif
-
 /*------------------- Set Library ---------------------*/
 #include "set.h"
 #include "prime.h"
-//#include "conf.h"
-#include "defs.h"
 #include "mathlib.h"
-//#include "funclib.h"
-
-
-//#include "_lalgebra.h"
-
-/*--------------- Atom Radius Lookup -------------------*/
-//#include "atomRadiusLookup.h"
-
-/*--------------- Structure data Structures-------------------*/
-//#include "PdbAtom.h"
-//#include "aminoAcid.h"
-//#include "atomBag.h"
-//#include "AtomList.h"
-//#include "caList.h"
-//#include "pdbParser.h"
-
 
 #include "SurfaceObject.h"
 #include "GeometryParser.h"
-//#include "SurfaceOutput.h"
-//#include "PocketAlignment.h"
-
-//#include "outputFile.h"
-
-
-//#ifdef OPENGL_RENDERING
-//#include "Renderer.h"
-//#include "ObjRenderer.h"
-//#endif
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -416,10 +416,6 @@ void SurfaceObject::draw(bool drawPoints, bool drawLines, bool drawTransparent, 
 	////Declare Materials
 	GLfloat mat_solid[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat mat_zero[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat mat_transparent[] = { 0.2, 0.2, 0.2, 0.2 };
-	GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat mat_specular[] = { 0.1, 0.1, 0.1, 0.0 };
-	GLfloat low_shininess[] = { .5 };
 
 	float amb[] = {0.20f, 0.50f, 1.0f, 0.1f};
 	float diff[] = {0.20f, 0.50f, 1.0f, 0.1f};

@@ -259,7 +259,6 @@ namespace DollarRecognizer
 			return RecognitionResult("Unknown", 1);
 		}
 
-        cout<<score<<endl;
 		RecognitionResult bestMatch(templates[indexOfBestMatch].name, score);
 		return bestMatch;
 	};

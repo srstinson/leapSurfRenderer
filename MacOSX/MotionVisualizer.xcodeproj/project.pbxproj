@@ -17,12 +17,14 @@
 		3C7A962D5BBA18CB57018AE1 /* juce_core.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517D850D45E76830692D9685 /* juce_core.mm */; };
 		646BE44B11B6F6780E358F19 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67A395CB9989EE338A5D86B8 /* IOKit.framework */; };
 		7F97ACEF182659BB9F68C372 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C497103C4D959C7A1A255CF /* OpenGL.framework */; };
+		8CB53FE21857B7B900094F22 /* GeometricRecognizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CB53FDC1857B7B900094F22 /* GeometricRecognizer.cpp */; };
+		8CB53FE31857B7B900094F22 /* GestureRecognitionEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CB53FDF1857B7B900094F22 /* GestureRecognitionEngine.cpp */; };
+		8CB53FEA1857BFA200094F22 /* Surfaces.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CB53FE81857BFA100094F22 /* Surfaces.cpp */; };
 		8CD2169917F127AF003511DD /* SurfaceObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CD2169617F127AF003511DD /* SurfaceObject.cpp */; };
 		8CD216A217F12A88003511DD /* set.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CD216A117F12A88003511DD /* set.c */; };
 		8CD216A417F12AE6003511DD /* mathlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CD216A317F12AE6003511DD /* mathlib.cpp */; };
 		8CD216A817F12C6A003511DD /* GeometryParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8CD216A717F12C6A003511DD /* GeometryParser.cpp */; };
 		8CD216AB17F135FC003511DD /* prime.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CD216AA17F135FC003511DD /* prime.c */; };
-		8DBDBA9A8E40F2415382957D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = AE04FF84DB418103BC75686A /* README.txt */; };
 		9127399EB0A1278BB75AC47C /* juce_gui_basics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 16013ACB449C4EC474B5D941 /* juce_gui_basics.mm */; };
 		991E4554EDD780FA7BFE74DB /* LeapUtilGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 033CFE4542018496FDC456EB /* LeapUtilGL.cpp */; };
 		BD2AD6176DCD9E69D74755F5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18DAA2E6F72C6ADBB2D2F5C2 /* QuartzCore.framework */; };
@@ -440,6 +442,15 @@
 		8C37C71564B27B6516D6AFD8 /* juce_AlertWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_AlertWindow.cpp; path = ../../../ThirdParty/JUCE/modules/juce_gui_basics/windows/juce_AlertWindow.cpp; sourceTree = SOURCE_ROOT; };
 		8C497103C4D959C7A1A255CF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		8C64342C4D1328F246423039 /* juce_AffineTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_AffineTransform.cpp; path = ../../../ThirdParty/JUCE/modules/juce_graphics/geometry/juce_AffineTransform.cpp; sourceTree = SOURCE_ROOT; };
+		8CB53FDC1857B7B900094F22 /* GeometricRecognizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeometricRecognizer.cpp; sourceTree = "<group>"; };
+		8CB53FDD1857B7B900094F22 /* GeometricRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeometricRecognizer.h; sourceTree = "<group>"; };
+		8CB53FDE1857B7B900094F22 /* GeometricRecognizerTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeometricRecognizerTypes.h; sourceTree = "<group>"; };
+		8CB53FDF1857B7B900094F22 /* GestureRecognitionEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GestureRecognitionEngine.cpp; sourceTree = "<group>"; };
+		8CB53FE01857B7B900094F22 /* GestureRecognitionEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GestureRecognitionEngine.h; sourceTree = "<group>"; };
+		8CB53FE11857B7B900094F22 /* GestureTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GestureTemplate.h; sourceTree = "<group>"; };
+		8CB53FE41857B85300094F22 /* Main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Main.h; sourceTree = "<group>"; };
+		8CB53FE81857BFA100094F22 /* Surfaces.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Surfaces.cpp; sourceTree = "<group>"; };
+		8CB53FE91857BFA200094F22 /* Surfaces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Surfaces.h; sourceTree = "<group>"; };
 		8CD2169617F127AF003511DD /* SurfaceObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SurfaceObject.cpp; sourceTree = "<group>"; };
 		8CD2169717F127AF003511DD /* SurfaceObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SurfaceObject.h; sourceTree = "<group>"; };
 		8CD2169A17F1282B003511DD /* StdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StdAfx.h; sourceTree = "<group>"; };
@@ -452,6 +463,7 @@
 		8CD216A717F12C6A003511DD /* GeometryParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeometryParser.cpp; sourceTree = "<group>"; };
 		8CD216A917F135E3003511DD /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
 		8CD216AA17F135FC003511DD /* prime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = prime.c; sourceTree = "<group>"; };
+		8CD5D993185C44FC00709E6C /* SampleGestures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleGestures.h; sourceTree = "<group>"; };
 		8CDC8FF8843F937148633C5A /* juce_String.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_String.cpp; path = ../../../ThirdParty/JUCE/modules/juce_core/text/juce_String.cpp; sourceTree = SOURCE_ROOT; };
 		8D908B8F089F30BCF7495319 /* juce_Value.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_Value.cpp; path = ../../../ThirdParty/JUCE/modules/juce_data_structures/values/juce_Value.cpp; sourceTree = SOURCE_ROOT; };
 		8EAB7C49891BE531DAD17DC0 /* juce_linux_Windowing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_linux_Windowing.cpp; path = ../../../ThirdParty/JUCE/modules/juce_gui_basics/native/juce_linux_Windowing.cpp; sourceTree = SOURCE_ROOT; };
@@ -508,7 +520,7 @@
 		AB7842857BDC5765D3A9B0B1 /* juce_mac_MouseCursor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = juce_mac_MouseCursor.mm; path = ../../../ThirdParty/JUCE/modules/juce_gui_basics/native/juce_mac_MouseCursor.mm; sourceTree = SOURCE_ROOT; };
 		AB9955E7BF67B9084B8B0A2E /* juce_BasicNativeHeaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_BasicNativeHeaders.h; path = ../../../ThirdParty/JUCE/modules/juce_core/native/juce_BasicNativeHeaders.h; sourceTree = SOURCE_ROOT; };
 		ABDD7A803850D42197F94191 /* juce_android_FileChooser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_android_FileChooser.cpp; path = ../../../ThirdParty/JUCE/modules/juce_gui_basics/native/juce_android_FileChooser.cpp; sourceTree = SOURCE_ROOT; };
-		AE04FF84DB418103BC75686A /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text.txt; name = README.txt; path = ../../README.txt; sourceTree = SOURCE_ROOT; };
+		AE04FF84DB418103BC75686A /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.txt; path = "/Users/zachdaniels/Desktop/Senior Project/LeapDeveloperKit/Examples/MotionVisualizer/README.txt"; sourceTree = "<absolute>"; };
 		AECA010D8B37753CB54CA323 /* juce_graphics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = juce_graphics.mm; path = ../../../ThirdParty/JUCE/modules/juce_graphics/juce_graphics.mm; sourceTree = SOURCE_ROOT; };
 		AEE83265DA625CFF5A3745A6 /* juce_Viewport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_Viewport.cpp; path = ../../../ThirdParty/JUCE/modules/juce_gui_basics/layout/juce_Viewport.cpp; sourceTree = SOURCE_ROOT; };
 		AF0FA2EADA441100F4C02253 /* juce_win32_SystemStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_win32_SystemStats.cpp; path = ../../../ThirdParty/JUCE/modules/juce_core/native/juce_win32_SystemStats.cpp; sourceTree = SOURCE_ROOT; };
@@ -1106,7 +1118,6 @@
 			children = (
 				DA00D2FC53413BA8909B1E7D /* Info.plist */,
 				A066F8D7FB44948BF863CAFF /* RecentFilesMenuTemplate.nib */,
-				AE04FF84DB418103BC75686A /* README.txt */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1700,6 +1711,13 @@
 		B75D3D72C9598E4CBF7A07E7 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				8CD5D993185C44FC00709E6C /* SampleGestures.h */,
+				8CB53FDC1857B7B900094F22 /* GeometricRecognizer.cpp */,
+				8CB53FDD1857B7B900094F22 /* GeometricRecognizer.h */,
+				8CB53FDE1857B7B900094F22 /* GeometricRecognizerTypes.h */,
+				8CB53FDF1857B7B900094F22 /* GestureRecognitionEngine.cpp */,
+				8CB53FE01857B7B900094F22 /* GestureRecognitionEngine.h */,
+				8CB53FE11857B7B900094F22 /* GestureTemplate.h */,
 				8CD2169A17F1282B003511DD /* StdAfx.h */,
 				8CD216A717F12C6A003511DD /* GeometryParser.cpp */,
 				8CD216A617F12C59003511DD /* GeometryParser.h */,
@@ -1710,10 +1728,13 @@
 				8CD2169617F127AF003511DD /* SurfaceObject.cpp */,
 				8CD2169717F127AF003511DD /* SurfaceObject.h */,
 				AE04FF84DB418103BC75686A /* README.txt */,
+				8CB53FE41857B85300094F22 /* Main.h */,
 				7EE89104750466A8CCC0DBEF /* Main.cpp */,
 				8CD216A117F12A88003511DD /* set.c */,
 				8CD216AA17F135FC003511DD /* prime.c */,
 				8CD216A917F135E3003511DD /* prime.h */,
+				8CB53FE81857BFA100094F22 /* Surfaces.cpp */,
+				8CB53FE91857BFA200094F22 /* Surfaces.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -2040,7 +2061,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				38D5CD42E79816C46844572C /* RecentFilesMenuTemplate.nib in Resources */,
-				8DBDBA9A8E40F2415382957D /* README.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2079,6 +2099,9 @@
 				8CD216A417F12AE6003511DD /* mathlib.cpp in Sources */,
 				8CD216A817F12C6A003511DD /* GeometryParser.cpp in Sources */,
 				8CD216AB17F135FC003511DD /* prime.c in Sources */,
+				8CB53FE21857B7B900094F22 /* GeometricRecognizer.cpp in Sources */,
+				8CB53FE31857B7B900094F22 /* GestureRecognitionEngine.cpp in Sources */,
+				8CB53FEA1857BFA200094F22 /* Surfaces.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2099,7 +2122,7 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				PRODUCT_NAME = MotionVisualizer;
+				PRODUCT_NAME = LeapRenderer;
 				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
@@ -2127,6 +2150,7 @@
 					../../../../LeapSDK/include,
 					../../../../LeapSDK/util,
 					"$(inherited)",
+					/usr/local/include,
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -2163,6 +2187,7 @@
 					../../../../LeapSDK/include,
 					../../../../LeapSDK/util,
 					"$(inherited)",
+					/usr/local/include,
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -2191,7 +2216,7 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				PRODUCT_NAME = MotionVisualizer;
+				PRODUCT_NAME = LeapRenderer;
 				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};

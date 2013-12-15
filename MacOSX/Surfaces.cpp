@@ -1,12 +1,12 @@
-//
-//  Surfaces.cpp
-//  MotionVisualizer
-//
-//  Created by Zach Daniels on 12/10/13.
-//
-//
+/*
+ Surfaces
+ Description: Surfaces holds the data structures for storing protein surface sets, is responsible for manipulating the surface sets, and controls which protein surface models are drawn and the transformations applied to these surfaces.
+ */
 
 #include "Surfaces.h"
+//#include <ctime> //For Benchmarking
+
+//int print = 0; //For Benchmarking
 
 Surfaces::Surfaces(){
     currentFile = "";
@@ -107,6 +107,9 @@ void Surfaces::setSetFileName(std::string name){
 }
 
 void Surfaces::draw(glm::quat myQuaternion, int keyFlag, bool transparent){
+    
+    //clock_t begin = clock(); //For Benchmarking
+    
     if (currentFile.compare("") != 0 && keyFlag == 0){
         
         if(surf == NULL){
@@ -138,6 +141,15 @@ void Surfaces::draw(glm::quat myQuaternion, int keyFlag, bool transparent){
             mutex.exit();
             glPopMatrix();
         }
+        //For Benchmarking
+        /*clock_t end = clock();
+        double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+        
+        if (print == 0){
+            std::cout<<surf->numTriangles<<"\t"<<elapsed_secs<<std::endl;
+            print++;
+        }*/
+
     }
 }
 
@@ -188,6 +200,7 @@ void Surfaces::setSurfaces(bool loadSurfaces){
         std::cout<<surfCompared<<" "<<surfTemp2<<std::endl;
         surfTemp2->dispose();
     }
+    //print = 0; //For Benchmarking
     mutex.exit();
 }
 

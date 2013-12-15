@@ -1,10 +1,18 @@
-/******************************************************************************\
- * Copyright (C) Leap Motion, Inc. 2011-2013.                                   *
- * Leap Motion proprietary and  confidential.  Not for distribution.            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at       *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement between *
- * Leap Motion and you, your company or other organization.                     *
- \******************************************************************************/
+/*
+ LeapRenderer
+ Description: The main program is responsible for three functions: rendering the application GUI, collecting data from inputs (namely the Leap Motion Controller, keyboard, and mouse), and managing the interactions between the various other components.
+ */
+
+//Used for testing accuracy rates
+#define SWIPE 0
+#define CIRCLE1 1
+#define CIRCLE2 2
+#define ARROW 3
+#define CARET 4
+#define CHECKMARK 5
+#define LOOP 6
+#define RECTANGLE 7
+
 #include "Main.h"
 
 class MotionVisualizerWindow;
@@ -83,9 +91,9 @@ public:
         kFlag_Help        = 1 << 1,
         kFlag_RedBlue3D   = 1 << 2,
         
-        kFlag_Transparent   = 1 << 3,
-        kFlag_Rotate      = 1 << 4,
-        kFlag_Scale       = 1 << 5,
+        kFlag_Transparent   = 1 << 3, //Transparency on?
+        kFlag_Rotate      = 1 << 4, //Rotation on?
+        kFlag_Scale       = 1 << 5, //Scaling on?
         kFlag_Automatic   = 1 << 6,
         
         kFlag_AutoDetectedTranslate   = 1 << 7,
@@ -163,63 +171,56 @@ public:
     {
     }
     
+    //Keypress Listener
     bool keyPressed( const KeyPress& keyPress )
     {
+        //Normal keypresses, not filename input
         if (keyFlag == 0){
             int iKeyCode = toupper(keyPress.getKeyCode());
             
+            //Esc: Close application
             if ( iKeyCode == KeyPress::escapeKey )
             {
                 JUCEApplication::quit();
                 return true;
             }
             
-            if ( iKeyCode == KeyPress::pageUpKey )
-            {
-                float fStep = (m_fLeftRightEyeShift < 1.0f) ? 0.05f : ((m_fLeftRightEyeShift < 5.0f)  ? 0.25f : 1.0f);
-                m_fLeftRightEyeShift = LeapUtil::Min( m_fLeftRightEyeShift + fStep, 50.0f );
-                updateStateStr();
-                return true;
-            }
-            
-            if ( iKeyCode == KeyPress::pageDownKey )
-            {
-                float fStep = (m_fLeftRightEyeShift > 5.0f) ? 1.0f : ((m_fLeftRightEyeShift > 1.0f)  ? 0.25f : 0.05f);
-                m_fLeftRightEyeShift = LeapUtil::Max( m_fLeftRightEyeShift - fStep, 0.0f );
-                updateStateStr();
-                return true;
-            }
-            
+            //Right Arrow: Surface set to the right 
             if ( iKeyCode == KeyPress::rightKey )
             {
                 surfaces.groupPointerRight();
                 return true;
             }
             
+            //Left Arrow: Surface set to the left
             if ( iKeyCode == KeyPress::leftKey )
             {
                 surfaces.groupPointerLeft();
                 return true;
             }
             
+            //Up Arrow: Query surface to the right
             if ( iKeyCode == KeyPress::upKey )
             {
                 surfaces.surfacePointerRight(0);
                 return true;
             }
             
+            //Down Arrow: Query surface to the left
             if ( iKeyCode == KeyPress::downKey )
             {
                 surfaces.surfacePointerLeft(0);
                 return true;
             }
             
+            //.: Compared surface to the right
             if ( iKeyCode == '.' )
             {
                 surfaces.surfacePointerRight(1);
                 return true;
             }
             
+            //,: Compared surface to the left
             if ( iKeyCode == ',' )
             {
                 surfaces.surfacePointerLeft(1);
@@ -228,35 +229,33 @@ public:
             
             switch ( iKeyCode )
             {
+                //Reset
                 case ' ':
                     resetScene();
                     resetCamera();
                     return true;
-                    
-                case '3':
-                    m_uiFlags ^= kFlag_RedBlue3D;
-                    break;
-                    
-                case 'A':
-                    m_uiFlags ^= kFlag_Automatic;
-                    break;
-                                        
+                
+                //Change mode
                 case 'M':
+                    //Classify -> Rotate
                     if (mode == 0){
                         mode = 1;
                         m_uiFlags ^= kFlag_Rotate;
                     }
+                    //Rotate -> Scale
                     else if (mode == 1){
                         m_uiFlags ^= kFlag_Rotate;
                         m_uiFlags ^= kFlag_Scale;
                         mode = 2;
                     }
+                    //Scale -> Classify
                     else if (mode == 2){
                         m_uiFlags ^= kFlag_Scale;
                         mode = 0;
                     }
                     break;
-                    
+                
+                //New surface set
                 case 'N':
                     if(surfaces.getSurfSetIndex() == 0 && (surfaces.getCurrentFileName() != "" || surfaces.getComparedFileName() != "")){
                         surfaces.newSet();
@@ -268,11 +267,13 @@ public:
                     surfaces.saveSurfSets();
                     m_strSave = "Up to Date";
                     break;
-                    
+                
+                //Set all surfaces transparent
                 case 'T':
                     m_uiFlags ^= kFlag_Transparent;
                     break;
-                    
+                
+                //Load query surface
                 case 'F':
                     surfaces.setCurrentFileName("");
                     surfaces.setSurfIndex(1,-1);
@@ -280,7 +281,8 @@ public:
                     surfaces.setSurfSetIndex(0);
                     keyFlag = 1;
                     break;
-                    
+                
+                //Load compared surface
                 case 'C':
                     surfaces.setComparedFileName("");
                     surfaces.setSurfIndex(1,-1);
@@ -288,12 +290,21 @@ public:
                     surfaces.setSurfSetIndex(0);
                     keyFlag = 2;
                     break;
-                    
+                
+                //Push surface from one surface set to the surface set to the right
                 case 'P':
-                    //moveSurface();
+                    surfaces.moveSurface();
                     m_strSave = "Not [S]aved";
                     break;
-                    
+                
+                //Print recognition vector; used for testing
+                case 'Q':
+                    for(int i=0; i < 8; i++){
+                        cout<<confusion[i]<<" ";
+                    }
+                    cout<<endl;
+                
+                //Turn finger visualizer on
                 case 'V':
                     if(fingerFlag){
                         fingerFlag = false;
@@ -309,12 +320,15 @@ public:
             
             updateStateStr();
         }
+        //Build query filename string
         else if(keyFlag == 1){
             int iKeyCode = keyPress.getKeyCode();
+            //String complete
             if(iKeyCode == KeyPress::returnKey){
                 surfaces.setSurfaces(false);
                 keyFlag = 0;
             }
+            //Delete character
             else if(iKeyCode == KeyPress::backspaceKey){
                 string currentFile = surfaces.getCurrentFileName();
                 if (currentFile.size() > 0){
@@ -322,6 +336,7 @@ public:
                     surfaces.setCurrentFileName(currentFile);
                 }
             }
+            //Get new character
             else{
                 char cKeyCode = keyPress.getTextCharacter();
                 string currentFile = surfaces.getCurrentFileName();
@@ -329,12 +344,15 @@ public:
                 surfaces.setCurrentFileName(currentFile);
             }
         }
+        //Build compared filename string
         else if(keyFlag == 2){
             int iKeyCode = keyPress.getKeyCode();
+            //String complete
             if(iKeyCode == KeyPress::returnKey){
                 surfaces.setSurfaces(false);
                 keyFlag = 0;
             }
+            //Delete character
             else if(iKeyCode == KeyPress::backspaceKey){
                 string comparedFile = surfaces.getComparedFileName();
                 if (comparedFile.size() > 0){
@@ -342,6 +360,7 @@ public:
                     surfaces.setComparedFileName(comparedFile);
                 }
             }
+            //Get new character
             else{
                 string comparedFile = surfaces.getComparedFileName();
                 char cKeyCode = keyPress.getTextCharacter();
@@ -349,12 +368,15 @@ public:
                 surfaces.setComparedFileName(comparedFile);
             }
         }
+        //Build new set name string
         else if(keyFlag == 3){
             int iKeyCode = keyPress.getKeyCode();
+            //String complete
             if(iKeyCode == KeyPress::returnKey){
                 surfaces.newSet();
                 keyFlag = 0;
             }
+            //Delete character
             else if(iKeyCode == KeyPress::backspaceKey){
                 string setName = surfaces.getSetFileName();
                 if (setName.size() > 0){
@@ -362,6 +384,7 @@ public:
                     surfaces.setSetFileName(setName);
                 }
             }
+            //Get new character
             else if(keyPress.isValid()){
                 string setName = surfaces.getSetFileName();
                 char cKeyCode = keyPress.getTextCharacter();
@@ -372,13 +395,14 @@ public:
         return true;
     }
     
+    //Update bottom bar information string
     void updateStateStr()
     {
         m_aStrState[0] = String::empty;
         m_aStrState[1] = String::empty;
         
         m_aStrState[0]  << "[T]ransparency: " << LeapUtil::BoolToStr( m_uiFlags & kFlag_Transparent );
-        m_aStrState[1]  << "Next [M]ode: "    << mode;//LeapUtil::BoolToStr( m_uiFlags & kFlag_Rotate );
+        m_aStrState[1]  << "Next [M]ode: "    << mode;
         
     }
     
@@ -387,6 +411,7 @@ public:
         (void)e;
     }
     
+    //Rotation by mouse
     void mouseDrag (const MouseEvent& e)
     {
         (void)e;
@@ -406,20 +431,24 @@ public:
         }
         
         if (direction == 1){
+            //rotate about y clockwise
             if(angleDirectionX > 0){
                 glm::vec3 eulerAngles(0, 0.05, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
             }
+            //rotate about y counterclockwise
             else{
                 glm::vec3 eulerAngles(0, -0.05, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
             }
         }
         else if (direction == 2){
+            //rotate about x clockwise
             if(angleDirectionY > 0){
                 glm::vec3 eulerAngles(0.05, 0, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
             }
+            //rotate about y counterclockwise
             else{
                 glm::vec3 eulerAngles(-0.05, 0, 0);
                 myQuaternion = glm::quat(eulerAngles) * myQuaternion;
@@ -427,6 +456,7 @@ public:
         }
     }
     
+    //Scale
     void mouseWheelMove ( const MouseEvent& e,
                          const MouseWheelDetails& wheel )
     {
@@ -436,9 +466,11 @@ public:
         static const float kfMaxScale = 3.0f;
         bool scaleDirection = wheel.deltaY >= 0;
         if(scaleDirection){
+            //Enlarge
             m_fTotalMotionScale = LeapUtil::Clamp(  m_fTotalMotionScale * float(1.05),kfMinScale,kfMaxScale );
         }
         else{
+            //Shrink
             m_fTotalMotionScale = LeapUtil::Clamp(  m_fTotalMotionScale * float(0.95),kfMinScale,kfMaxScale );
         }
     }
@@ -452,6 +484,7 @@ public:
         (void)g;
     }
     
+    //Draw "frame" of GUI (not Leap frame)
     void renderOpenGL2D()
     {
         LeapUtilGL::GLAttribScope attribScope( GL_ENABLE_BIT );
@@ -468,17 +501,20 @@ public:
         
         Graphics g(glRenderer);
         
-        int iMargin   = 10;
-        int iFontSize = static_cast<int>(m_fixedFont.getHeight());
-        int iLineStep = iFontSize + (iFontSize >> 2);
-        int iBaseLine = 20;
-        Font origFont = g.getCurrentFont();
+        int iMargin   = 10; //Margin size
+        int iFontSize = static_cast<int>(m_fixedFont.getHeight()); //Font size
+        int iLineStep = iFontSize + (iFontSize >> 2); //Line height
+        int iBaseLine = 20; //Base line height
+        Font origFont = g.getCurrentFont(); //Font
         
+        //Window bounds
         const Rectangle<int>& rectBounds = getBounds();
         
         g.setFont( static_cast<float>(iFontSize) );
         
         g.setColour( Colours::salmon );
+        
+        //Draw top bars (filename related information)
         m_strFile += surfaces.getCurrentFileName().c_str();
         m_strCompFile += surfaces.getComparedFileName().c_str();
         int surfSetIndex = surfaces.getSurfSetIndex();
@@ -509,6 +545,8 @@ public:
         
         g.setColour( Colours::orange );
         
+        
+        //Draw bottom bar (mode and transparency information)
         for ( int i = 1, uiTotalWidth = 0; i >= 0; i-- )
         {
             if ( !m_aStrState[i].isEmpty() )
@@ -530,6 +568,8 @@ public:
                 uiTotalWidth += uiStrWidth + iFontSize;
             }
         }
+        
+        //Draw set and surface pointer information
         m_strGroup = "Group: ";
         vector<string> surfSets = surfaces.getSurfSets();
         for(int i = 0; i < surfSets.size() + 1; i++){
@@ -548,7 +588,6 @@ public:
                              rectBounds.getBottom() - 2*(iFontSize*2),
                              Justification::horizontallyCentred );
         m_strIndividual = "Surfs: ";
-
         if(surfSetIndex >= 1){
             vector<vector<string>> surfsInSet = surfaces.getSurfsInSet();
             int surfIndex1 = surfaces.getSurfIndex(1);
@@ -569,9 +608,7 @@ public:
         }
     }
     
-    //
-    // calculations that should only be done once per leap data frame but may be drawn many times should go here.
-    //
+    //Updates to be done on Leap data frame
     void update( Leap::Frame frame )
     {
         ScopedLock sceneGraphLock(m_renderMutex);
@@ -590,15 +627,6 @@ public:
         
         static const float kfMaxScale = 3.0f;
         
-        //If automatic motion type detection is enabled, check if motion probabilities are above threshold amounts
-        bool bShouldTranslate = true;
-        bool bShouldRotate    = true;
-        bool bShouldScale     = true;
-        
-        //recognitionEngine current coord to the Gesture Recognition Engine
-        
-        
-        
         if(frameCount < 3){
             frameCount++;
         }
@@ -608,17 +636,22 @@ public:
         
         bool gestureFlag = false;
         
+        //Every three frames
         if(frameCount == 0){
+            //Single finger
             if (frame.fingers().count() == 1){
                 float x,y;
                 
                 Leap::FingerList fingers = frame.fingers();
                 
+                //Find x and y of finger
                 x = fingers[0].tipPosition().x;
                 y = -fingers[0].tipPosition().y;
                 
+                //Calculate distance moved
                 float distance = pow((previousX - x),2) + pow((previousY - y),2);
-                                
+                
+                //Approximately same position
                 if(distance > 5){
                     recognitionEngine->updateCoord(frame);
                 }
@@ -632,12 +665,10 @@ public:
                 previousX = x;
                 previousY = y;
             }
+            //Recognize single finger gesture if 0 fingers or finger in same position for 3 frames
             if(frame.fingers().count() == 0 || gestureFlag){
                 string dollarGestureName = recognitionEngine->recognize().name;
-                double dollarGestureScore = recognitionEngine->recognize().score;
-                if(dollarGestureName != "Unknown"){
-                    std::cout<<dollarGestureName<<" "<<dollarGestureScore<<std::endl;
-                }
+                //Arrow: Change mode
                 if(dollarGestureName == "Arrow"){
                     if (mode == 0){
                         mode = 1;
@@ -652,20 +683,32 @@ public:
                         m_uiFlags ^= kFlag_Scale;
                         mode = 0;
                     }
+                    confusion[ARROW] = confusion[ARROW]+1;
+
                     updateStateStr();
                 }
+                //Loop: Move surface to surface set to the right
                 else if(dollarGestureName == "Pigtail" && mode == 0){
                     surfaces.moveSurface();
+                    confusion[LOOP] = confusion[LOOP]+1;
+
                     m_strSave = "Not [S]aved";
                 }
+                //Checkmark: Save state
                 else if(dollarGestureName == "CheckMark" && mode == 0){
                     surfaces.saveSurfSets();
+                    confusion[CHECKMARK] = confusion[CHECKMARK]+1;
+
                     m_strSave = "Up to Date";
                 }
+                //Rectangle: Make all surfaces transparent
                 else if(dollarGestureName == "Rectangle"){
                     m_uiFlags ^= kFlag_Transparent;
+                    confusion[RECTANGLE] = confusion[RECTANGLE]+1;
+
                     updateStateStr();
                 }
+                //Caret: Create new surface set
                 else if(dollarGestureName == "Caret"){
                     string currentFile = surfaces.getCurrentFileName();
                     string comparedFile = surfaces.getComparedFileName();
@@ -675,16 +718,20 @@ public:
                         keyFlag = 3;
                         keyPressed( KeyPress() );
                     }
+                    confusion[CARET] = confusion[CARET]+1;
                 }
+                //Clear path from recognition engine
                 recognitionEngine->clear();
             }
         }
         
         const Leap::GestureList gestures = frame.gestures();
+        //Leap recognized a gesture
         if(gestures.count() > 0) {
             Leap::Gesture gesture = gestures[0];
             time_t timerEnd = time(NULL);
             switch (gesture.type()) {
+                //Circle
                 case Leap::Gesture::TYPE_CIRCLE:
                 {
                     if (mode == 0){
@@ -692,41 +739,59 @@ public:
                         std::string clockwiseness;
                         if (gesture.id() != lastCircle){
                             lastCircle = gesture.id();
+                            //1 Pointer: Change query surface
                             if (frame.fingers().count() == 2){
+                                //Right
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
                                     surfaces.surfacePointerRight(0);
                                     clockwiseness = "clockwise";
-                                } else {
+                                }
+                                //Left
+                                else {
                                     surfaces.surfacePointerLeft(0);
                                     clockwiseness = "counterclockwise";
                                 }
+                                confusion[CIRCLE1] = confusion[CIRCLE1]+1;
+
                             }
+                            //2 Pointers: Change compared surface
                             else if(frame.fingers().count() == 3){
+                                //Right
                                 if (circle.pointable().direction().angleTo(circle.normal()) <= PI/4) {
                                     surfaces.surfacePointerRight(1);
                                     clockwiseness = "clockwise";
-                                } else {
+                                }
+                                //Left
+                                else {
                                     surfaces.surfacePointerLeft(1);
                                     clockwiseness = "counterclockwise";
                                 }
+                                confusion[CIRCLE2] = confusion[CIRCLE2]+1;
+
                             }
                         }
                     }
                     break;
                 }
+                //Swipe: Change surface set
                 case Leap::Gesture::TYPE_SWIPE:
                 {
+                    //Five fingers needed
                     if (mode == 0  && frame.fingers().count() >= 5){
                         Leap::SwipeGesture swipe = gesture;
+                        //Only if 2 seconds or more since last swipe
                         if (gesture.id() != lastSwipe && difftime(timerEnd,timerStart) >= 2 && !frame.fingers().isEmpty()){
                             lastSwipe = gesture.id();
+                            //Right
                             if (swipe.direction().x > 0){
                                 surfaces.groupPointerRight();
                             }
+                            //Left
                             else{
                                 surfaces.groupPointerLeft();
                             }
                             timerStart = time(NULL);
+                            confusion[SWIPE] = confusion[SWIPE]+1;
                         }
                     }
                     break;
@@ -739,13 +804,15 @@ public:
         
         m_uiFlags &= ~(kFlags_AutoDetectedTransforms);
         
+        bool bShouldRotate; //Rotation ok
+        bool bShouldScale; //Scaling ok
+        
         if ( m_uiFlags & kFlag_Automatic )
         {
-            bShouldTranslate = false;
+            //Minimum certainness of translation ensures transformations not too sensitive
             bShouldRotate    = frame.translationProbability(m_lastFrame)    > 0.60;
             bShouldScale     = frame.translationProbability(m_lastFrame)    > 0.80;
             
-            m_uiFlags |= bShouldTranslate ? kFlag_AutoDetectedTranslate : 0;
             m_uiFlags |= bShouldRotate ? kFlag_AutoDetectedRotate : 0;
             m_uiFlags |= bShouldScale ? kFlag_AutoDetectedScale : 0;
         }
@@ -768,20 +835,24 @@ public:
             }
             
             if (direction == 1){
+                //rotate clockwise about y
                 if(angleDirectionX > 0){
                     glm::vec3 eulerAngles(0, 0.05, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
+                //rotate counterclockwise about y
                 else{
                     glm::vec3 eulerAngles(0, -0.05, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
             }
             else if (direction == 2){
+                //rotate clockwise about x
                 if(angleDirectionY > 0){
                     glm::vec3 eulerAngles(0.05, 0, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
                 }
+                //rotate counterclockwise about x
                 else{
                     glm::vec3 eulerAngles(-0.05, 0, 0);
                     myQuaternion = glm::quat(eulerAngles) * myQuaternion;
@@ -804,7 +875,6 @@ public:
         
     }
     
-    /// affects model view matrix.  needs to be inside a glPush/glPop matrix block!
     void setupScene()
     {
         OpenGLHelpers::clear( Colours::black.withAlpha(0.0f) );
@@ -826,6 +896,7 @@ public:
         
     }
     
+    //Draw the surfaces
     void drawScene( eDrawMode drawMode )
     {
         LeapUtilGL::GLMatrixScope sceneMatrixScope;
@@ -861,10 +932,11 @@ public:
         glPointSize(POINTSIZE);
         glLineWidth(LINEWIDTH);
         
-        
+        //Draw surfaces
         surfaces.draw(myQuaternion,keyFlag,(m_uiFlags & kFlag_Transparent));
     }
     
+    //Rendering per frame
     void renderOpenGL()
     {
         {
@@ -931,6 +1003,7 @@ public:
         }
     }
     
+    //Draw finger visualizer
     void drawPointables(Leap::Frame frame){
         
         const Leap::FingerList& pointables = frame.fingers();
@@ -1074,10 +1147,10 @@ public:
     }
 };
 
+//Code to run when application loads
 void MotionVisualizerApplication::initialise (const String& commandLine)
 {
     (void) commandLine;
-    // Do your application's initialisation code here..
     keyFlag = 0;
     getController().enableGesture(Leap::Gesture::TYPE_CIRCLE);
     getController().enableGesture(Leap::Gesture::TYPE_SWIPE);
@@ -1085,6 +1158,10 @@ void MotionVisualizerApplication::initialise (const String& commandLine)
     myQuaternion = glm::quat(eulerAngles);
     timerStart = time(NULL);
     recognitionEngine->Instance();
+    
+    for(int i=0; i<8; i++){
+        confusion[i] = 0;
+    }
     m_pMainWindow = new MotionVisualizerWindow();
 }
 

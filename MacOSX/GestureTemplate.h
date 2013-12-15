@@ -1,6 +1,3 @@
-//#ifndef _GestureTemplateIncluded_
-//#define _GestureTemplateIncluded_
-
 #include <string>
 
 using namespace std;
@@ -22,5 +19,3 @@ public:
 
 typedef vector<GestureTemplate> GestureTemplates;
 }
-
-//#endif
